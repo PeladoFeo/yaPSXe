@@ -16,7 +16,7 @@
 	0x0000_0000 - 0x0000_ffff	Kernel (64K)
 	0x0001_0000 - 0x001f_ffff	User Memory (1.9 Meg)
 	0x1f00_0000 - 0x1f00_ffff	Parallel Port (64K)
-	0x1f80_0000 - 0x1f80_03ff	Scratch Pad (1024 bytes)
+	0x1f80_0000 - 0x1f80_03ff	Scratch Pad (D-cache) (1024 bytes)
 	0x1f80_1000 - 0x1f80_2fff	Hardware Registers (8K)
 	0x8000_0000 - 0x801f_ffff	Kernel and User Memory Mirror (2 Meg Cached)
 	0xa000_0000 - 0xa01f_ffff	Kernel and User Memory Mirror (2 Meg Uncached)
