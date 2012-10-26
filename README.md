@@ -1,4 +1,4 @@
-## yaPSXe
+## yaPSXe (Yet Another PSX Emulator)
 
 <img src="http://img547.imageshack.us/img547/7241/scph101.jpg" width="320" height="240" alt="bios" title="scph-101 boot" align="center" />
 
