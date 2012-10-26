@@ -50,20 +50,32 @@ CPsx::~CPsx() {
 
 	/* the order that these are deleted in matters. 
 	   don't touch. */
-	delete conf;
-	delete mPCBreakpoints;
-	delete cpu;
-	delete spu;
-	delete interpreter;
-	delete mem;
-	delete gl;
-	delete gpu;
+	delete conf; 
+	conf = 0;
+	delete mPCBreakpoints; 
+	mPCBreakpoints = 0;
+	delete cpu; 
+	cpu = 0;
+	delete spu; 
+	spu = 0;
+	delete interpreter; 
+	interpreter = 0;
+	delete mem; 
+	mem = 0;
+	delete gl; 
+	gl = 0;
+	delete gpu; 
+	gpu = 0;
 #if defined (_DEBUG)
-	delete mCpuDbg;
+	delete mCpuDbg; 
+	mCpuDbg = 0;
 #endif
-	delete mMainWnd;
-	delete mDispWnd;
-	delete csl;
+	delete mMainWnd; 
+	mMainWnd = 0;
+	delete mDispWnd; 
+	mDispWnd = 0;
+	delete csl; 
+	csl = 0;
 }
 
 void CPsx::PauseEmulation(BOOL pause) {
