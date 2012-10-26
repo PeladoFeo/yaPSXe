@@ -21,6 +21,10 @@
 	0x8000_0000 - 0x801f_ffff	Kernel and User Memory Mirror (2 Meg Cached)
 	0xa000_0000 - 0xa01f_ffff	Kernel and User Memory Mirror (2 Meg Uncached)
 	0xbfc0_0000 - 0xbfc7_ffff	BIOS (512K)
+	
+	However, a “TLB”, which is the virtual memory management device for the R3000 CPU, is not mounted.
+	Therefore, the relationship between the physical address and the logic address of the memory space is
+	always fixed.
 */
 
 CMemory::CMemory() {
