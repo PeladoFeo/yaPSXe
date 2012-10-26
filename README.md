@@ -4,6 +4,6 @@
 
 ## Description
 
-yaPSXe is a Playstation 1 emulator still in its early stages. I am making it public at this stage in the hope that it might attract the attention of other emulator developers who could help get this project off the ground.
+yaPSXe is a Playstation 1 emulator still in its early stages. It is written in C++ and developed in VC++ 2010. I am making it public at this stage in the hope that it might attract the attention of other emulator developers who could help get this project off the ground.
 
 Contact: <a href="mailto:ryan.hackett@hotmail.co.uk">ryan.hackett@hotmail.co.uk</a>
