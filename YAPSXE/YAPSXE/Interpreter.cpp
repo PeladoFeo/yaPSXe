@@ -35,10 +35,12 @@ CInterpreter::CInterpreter() {
 #endif
 	bLogBiosCalls = FALSE;
 	bDoStep = FALSE;
-	cpu = CPsx::GetInstance()->cpu;
-	mem = CPsx::GetInstance()->mem;
-	gpu = CPsx::GetInstance()->gpu;
-	csl = CPsx::GetInstance()->csl;
+	tFrameStart = tFrameEnd = 0;
+	psx = CPsx::GetInstance();
+	cpu = psx->cpu;
+	mem = psx->mem;
+	gpu = psx->gpu;
+	csl = psx->csl;
 }
 
 CInterpreter::~CInterpreter() {
@@ -72,18 +74,17 @@ void CInterpreter::Execute() {
 			} break;
 				
 			case PSX_CPU_HALTED:
-				Sleep(10);
+				//Sleep(10);
 				break;
 		} 
 #else if defined(_RELEASE)
 		if (cpu->state == PSX_CPU_RUNNING) {
 			ExecuteInstruction();
 		} else {
-			Sleep(10);
+			//Sleep(10);
 		}
 #endif
-		/* it may make more sense to put this in ExecuteInstruction,
-		   but we want the clock to tick regardless of the CPU's state */
+		CheckInterrupts();
 		cpu->cycles += 1;
 		cpu->mTotalCycles += 1;
 	}
@@ -105,8 +106,6 @@ void CInterpreter::LogBiosCall() {
 }
 
 void CInterpreter::ExecuteInstruction() {
-	CheckInterrupts();
-
 #if defined (LOG_BIOS_CALLS)
 	LogBiosCall();
 #endif

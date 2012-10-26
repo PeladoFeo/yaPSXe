@@ -14,6 +14,12 @@
 #define LOG_DMA	
 #endif
 
+/* 
+	TODO: I need information on DMA timings. I can't seem to find
+	any info online, perhaps some testing on the real hardware
+	is in order?
+*/
+
 void CMemory::DmaExecute(int n) {
 	if ( !(mDmaDPCR & (8 << (n * 4)) && (mDmaCHCR[n] & 0x01000000)) )  {
 		return;
@@ -53,6 +59,8 @@ void CMemory::DmaExecute(int n) {
 #if defined (LOG_DMA)
 					csl->out(CGREEN, "DMA2 GPU: mem to vram\n");
 #endif
+					cpu->cycles += 1000;
+
 					u32 *ptr = (u32*)(RAM + madr);
 					u32 size = (bcr >> 16) * (bcr & 0xffff);
 					gpu->WriteData(ptr, size);
@@ -68,6 +76,8 @@ void CMemory::DmaExecute(int n) {
 					u32 size;
 
 					do {
+						cpu->cycles += 10;
+
 						size = wmem[0] >> 24;
 						nextaddr = wmem[0] & 0xffffff;
 						gpu->WriteData(wmem+1, size);
@@ -126,7 +136,7 @@ void CMemory::DmaExecute(int n) {
 	}
 
 	/* cheap emulation of dma timing. */
-	cpu->cycles += 80000;
+	//cpu->cycles += 80000;
 
 	//mDmaCHCR[n] &= ~0x01000000;
 	//if (mDmaDICR & (1 << (16 + n))) { 

@@ -407,17 +407,14 @@ int WINAPI WinMain( HINSTANCE hInstance,
 
 	CreateThreads(psx);
 
-	DWORD end, start = timeGetTime();
+	DWORD start = timeGetTime();
+	static char title[256];
 
 	while (!psx->quit) {
 		if (psx->cpu->state == PSX_CPU_RUNNING) {
-			end = timeGetTime();
-
-			if (end-start > 1000) {
-				float curSpeed = ((float)psx->cpu->mTotalCycles / CPsx::CPU_CLOCK) * 100.0;
-
-				static char title[256];
-				sprintf_s(title, 256, "%.2f%%", curSpeed);
+			if (timeGetTime()-start > 1000) {
+				float speed = ((float)psx->cpu->mTotalCycles / CPsx::CPU_CLOCK) * 100.0;
+				sprintf_s(title, 256, "%.2f fps (%.2f%%)", (speed / 100.0) * 60.0, speed);
 				SetWindowText(psx->mDispWnd->GetHwnd(), title);
 				start = timeGetTime();
 				psx->cpu->mTotalCycles = 0;

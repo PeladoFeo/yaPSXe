@@ -121,6 +121,8 @@ public:
 	static void gteGPL();
 	static void gteNCCT();
 
+	DWORD tFrameStart, tFrameEnd;
+
 	BOOL bDoStep;
 	BOOL bCpuTraceLog;
 	BOOL bLogBiosCalls;
@@ -136,6 +138,7 @@ public:
 	static PsxCpuInstruction psxCP2[64];
 	static PsxCpuInstruction psxCP2BSC[32];
 
+	CPsx *psx;
 	static CpuState *cpu;
 	static CMemory *mem;
 	CGpu *gpu;

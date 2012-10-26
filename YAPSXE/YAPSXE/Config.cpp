@@ -8,6 +8,13 @@
 #include "Windows.h"
 #include "Psx.h"
 
+
+/* 
+	configuration settings are stored in the registry under
+	'HKEY_CURRENT_USER\\Software\\YAPSXE'.
+*/
+
+
 const std::string Config::regions[] = {"NTSC:J", "NTSC:U/C", "PAL", "NTSC:J"};
 
 Config::Config() {
@@ -19,6 +26,7 @@ Config::Config() {
 
 	mBiosDirectoryPath = GetBiosDirKey();
 	std::string strCurBios = GetCurBiosRegKey();
+	bLimitFps = GetLimitFpsKey();
 
 	/* try to load the bios if it's configured */
 	if (strCurBios != DEFAULT_REG_STR_KEY_VAL) {
@@ -160,11 +168,25 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 			HWND hBiosDirEdit = GetDlgItem(hDlg, IDC_BIOS_DIR_EDIT);
 			SetWindowText(hBiosDirEdit, psx->conf->mBiosDirectoryPath.c_str());
 
+			// set the limitfps button 
+			CheckDlgButton(hDlg, IDC_LIMIT_FPS_CHECK, psx->conf->GetLimitFpsKey()); 
 		} break;
 
 		case WM_COMMAND: 
 			switch(LOWORD(wParam)) {
 				case ID_OK: {
+					long res = Button_GetCheck(GetDlgItem(hDlg, IDC_LIMIT_FPS_CHECK));
+					if(res == BST_CHECKED) {
+						psx->conf->bLimitFps = TRUE;
+						psx->conf->SetLimitFpsKey(TRUE);
+					} else if(res == BST_UNCHECKED) {
+						psx->conf->bLimitFps = FALSE;
+						psx->conf->SetLimitFpsKey(FALSE);
+					}
+
+					/* 
+						handle bios related stuff 
+					*/
 					HWND hwndBiosCombo = GetDlgItem(hDlg, IDC_CONF_BIOS_LIST_COMBO);
 					int index = ComboBox_GetCurSel(hwndBiosCombo);
 
@@ -178,6 +200,7 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 							break;
 						}
 					}
+					/* ********************* */
 
 					EndDialog(hDlg, LOWORD(wParam));
 				} break;
@@ -203,6 +226,9 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 					Config::RefreshBiosCombo(hDlg, vBiosFiles, psx);
 					HWND hBiosDirEdit = GetDlgItem(hDlg, IDC_BIOS_DIR_EDIT);
 					SetWindowText(hBiosDirEdit, psx->conf->mBiosDirectoryPath.c_str());
+				} break;
+
+				case IDC_LIMIT_FPS_CHECK: {
 				} break;
 			}
 			break;
@@ -247,6 +273,16 @@ BOOL Config::OpenRegistryKeys() {
 		}
 		SetBiosDirKey("BIOS"); // default BIOS directory path
 	}
+
+	/* current bios directory key */
+	if (RegOpenKeyEx( hParentKey, "LimitFPS", 0, 
+					  KEY_ALL_ACCESS, &hLimitFpsKey) != ERROR_SUCCESS) {
+		if (RegCreateKeyEx( hParentKey, "LimitFps", 0, 0, REG_OPTION_NON_VOLATILE, 
+						    KEY_ALL_ACCESS, NULL, &hLimitFpsKey, 0) != ERROR_SUCCESS) {
+			return FALSE;
+		}
+		SetLimitFpsKey(TRUE);
+	}
 	
 	return TRUE;
 }
@@ -275,4 +311,19 @@ std::string Config::GetBiosDirKey() {
 	RegQueryValueEx( hBiosDirectory, NULL, 0, NULL, 
 				  (LPBYTE)str, (LPDWORD)&size);
 	return std::string(str);
+}
+
+void Config::SetLimitFpsKey(BOOL val) {
+	std::string str;
+	str = (val ? "true" : "false");
+	RegSetValueEx( hLimitFpsKey, NULL, 0, REG_SZ, 
+		(const BYTE*)str.c_str(), str.length());
+}
+
+BOOL Config::GetLimitFpsKey() {
+	char str[MAX_PATH];
+	DWORD size = MAX_PATH;
+	RegQueryValueEx( hLimitFpsKey, NULL, 0, NULL, 
+				  (LPBYTE)str, (LPDWORD)&size);
+	return (std::string(str) == "true" ? true : false);
 }

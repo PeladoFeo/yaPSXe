@@ -32,10 +32,15 @@ public:
 	std::string GetCurBiosRegKey();
 	void SetBiosDirKey(char *fileName);
 	std::string GetBiosDirKey();
+	void SetLimitFpsKey(BOOL val);
+	BOOL GetLimitFpsKey();
 
 	HKEY hParentKey;
 	HKEY hCurBiosFileKey;
 	HKEY hBiosDirectory;
+	HKEY hLimitFpsKey;
+
+	BOOL bLimitFps;
 
 	BOOL bBiosLoaded;
 	CPsx *psx;

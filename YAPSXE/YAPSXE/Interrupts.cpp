@@ -7,6 +7,7 @@
 #include "Common.h"
 #include "Psx.h"
 #include "CpuDebugger.h"
+#include "Config.h"
 
 
 void CpuState::Exception(u32 code) {
@@ -39,15 +40,25 @@ void CInterpreter::CheckInterrupts() {
 	}
 
 	if (cpu->cycles >= (HSYNC*262)) {
-		//cpu->mTotalCycles += cpu->cycles;
 		cpu->cycles = 0;
 		gpu->UpdateScreen();
-		//mem->mIREG &= ~VBL_INTR;	// clear vbl? no
+
+		/* limit to about 60fps */
+		if (psx->conf->bLimitFps) {
+			tFrameEnd = timeGetTime();
+
+			while ((tFrameEnd-tFrameStart) <= 16)
+				tFrameEnd = timeGetTime();
+
+			tFrameStart = timeGetTime();
+		}
 	}
 
-	//if (mem->mDmaDICR & 0x7f000000) { 
-	//	mem->mIREG |= DMA_INTR;
-	//}
+#if 0
+	if (mem->mDmaDICR & 0x7f000000) { 
+		mem->mIREG |= DMA_INTR;
+	}
+#endif
 
 	if (mem->mIREG & mem->mIMASK) {
 		if ((cpu->CP0[CP0_STATUS] & 0x401) == 0x401) {
