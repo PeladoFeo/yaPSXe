@@ -353,7 +353,7 @@ void CInterpreter::psxMTLO() {
 }
 
 void CInterpreter::psxMULT() {
-	u64 res = (u64)((s64)(s32)RS * (s64)(s32)RT);
+	u64 res = (s64)((s64)(s32)RS * (s64)(s32)RT);
 	cpu->lo = (u32)(res & 0xffffffff);
 	cpu->hi = (u32)((res >> 32) & 0xffffffff);
 }
