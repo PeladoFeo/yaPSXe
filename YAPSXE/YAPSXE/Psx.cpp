@@ -46,36 +46,61 @@ CPsx::CPsx() {
 }
 
 CPsx::~CPsx() {
-	cpu->SetCpuState(PSX_CPU_HALTED);
+	// must stop the emulation thread first
+	SuspendThread(mEmuThread);
 
 	/* the order that these are deleted in matters. 
 	   don't touch. */
-	delete conf; 
-	conf = 0;
-	delete mPCBreakpoints; 
-	mPCBreakpoints = 0;
-	delete cpu; 
-	cpu = 0;
-	delete spu; 
-	spu = 0;
-	delete interpreter; 
-	interpreter = 0;
-	delete mem; 
-	mem = 0;
-	delete gl; 
-	gl = 0;
-	delete gpu; 
-	gpu = 0;
+	if (conf) {
+		delete conf; 
+		conf = 0;
+	}
+	if (mPCBreakpoints) {
+		delete mPCBreakpoints; 
+		mPCBreakpoints = 0;
+	}
+	if (cpu) {
+		delete cpu; 
+		cpu = 0;
+	}
+	if (spu) {
+		delete spu;
+		spu = 0;
+	}
+	if (interpreter) {
+		delete interpreter; 
+		interpreter = 0;
+	}
+	if (mem) {
+		delete mem; 
+		mem = 0;
+	}
+	if (gl) {
+		delete gl; 
+		gl = 0;
+	}
+	if (gpu) {
+		delete gpu; 
+		gpu = 0;
+	}
 #if defined (_DEBUG)
-	delete mCpuDbg; 
-	mCpuDbg = 0;
+	if (mCpuDbg) {
+		delete mCpuDbg; 
+		mCpuDbg = 0;
+	}
 #endif
-	delete mMainWnd; 
-	mMainWnd = 0;
-	delete mDispWnd; 
-	mDispWnd = 0;
-	delete csl; 
-	csl = 0;
+	if (mMainWnd) {
+		delete mMainWnd; 
+		mMainWnd = 0;
+	}
+	if (mDispWnd) {
+		delete mDispWnd; 
+		mDispWnd = 0;
+	}
+	if (csl) {
+		delete csl; 
+		csl = 0;
+	}
 }
 
 void CPsx::PauseEmulation(BOOL pause) {

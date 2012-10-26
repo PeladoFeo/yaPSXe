@@ -98,6 +98,7 @@
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="OpenGL.cpp" />
     <ClCompile Include="Psx.cpp" />
+    <ClCompile Include="RootCounters.cpp" />
     <ClCompile Include="Spu.cpp" />
     <ClCompile Include="Windows.cpp" />
   </ItemGroup>

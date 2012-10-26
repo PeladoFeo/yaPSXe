@@ -41,12 +41,10 @@ void CInterpreter::CheckInterrupts() {
 
 	if (cpu->cycles >= (HSYNC*262)) {
 		cpu->cycles = 0;
+
+		gpu->UpdateScreen();
 		
-		if (gpu) {
-			gpu->UpdateScreen();
-		}
-		
-		/* limit to about 60fps */
+		/* limit to about 60fps if wanted */
 		if (psx->conf->bLimitFps) {
 			tFrameEnd = timeGetTime();
 
