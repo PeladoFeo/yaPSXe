@@ -50,6 +50,7 @@ public:
 	static BOOL IsResolutionSupported(int width, int height);
 	static BOOL OpenFileDlg(HWND hwnd, char *out, char *filter);
 	static BOOL SaveFileDlg(HWND hWnd, char *out, char *filter);
+	static BOOL GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle);
 
 	void MenuCreate();
 	void MenuSet();

@@ -39,6 +39,31 @@ BOOL CWindow::OpenFileDlg(HWND hwnd, char *out, char *filter) {
 	}
 }
 
+
+/*
+ * Displays a directory selection dialog. CoInitialize must be called before calling this function.
+ * szBuf must be MAX_PATH characters in length. hWnd may be NULL.
+ */
+BOOL CWindow::GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle) {
+	LPITEMIDLIST pidl     = NULL;
+	BROWSEINFO   bi       = { 0 };
+	BOOL         bResult  = FALSE;
+
+	bi.hwndOwner      = hWnd;
+	bi.pszDisplayName = szBuf;
+	bi.pidlRoot       = NULL;
+	bi.lpszTitle      = szTitle;
+	bi.ulFlags        = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
+
+	if ((pidl = SHBrowseForFolder(&bi)) != NULL)
+	{
+		bResult = SHGetPathFromIDList(pidl, szBuf);
+		CoTaskMemFree(pidl);
+	}
+
+	return bResult;
+}
+
 BOOL CWindow::SaveFileDlg(HWND hWnd, char *out, char *filter) {
 	if (!out) return FALSE;
 	OPENFILENAME ofn;
@@ -373,6 +398,8 @@ int WINAPI WinMain( HINSTANCE hInstance,
 					int nCmdShow)
 {
 	CPsx *psx = CPsx::GetInstance();
+
+	CoInitialize(NULL);
 
 	if (!CreateMainWindows(psx)) {
 		return 1;

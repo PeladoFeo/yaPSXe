@@ -42,7 +42,7 @@ void CInterpreter::CheckInterrupts() {
 		//cpu->mTotalCycles += cpu->cycles;
 		cpu->cycles = 0;
 		gpu->UpdateScreen();
-		mem->mIREG &= ~VBL_INTR;	// clear vbl?
+		//mem->mIREG &= ~VBL_INTR;	// clear vbl? no
 	}
 
 	//if (mem->mDmaDICR & 0x7f000000) { 

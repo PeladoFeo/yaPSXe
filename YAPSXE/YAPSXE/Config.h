@@ -23,14 +23,19 @@ public:
 	static BOOL IsValidBiosFile(std::string path, const BiosInfo **info);
 	static std::vector<ConfigBiosFiles> GetValidBiosFileNamesInDir(std::string directory);
 
+	static void RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFiles, CPsx *psx);
+
 	static const std::string regions[];
-	static std::string mBiosDirectoryPath;
+	std::string mBiosDirectoryPath;
 
 	void SetCurBiosRegKey(char *fileName);
 	std::string GetCurBiosRegKey();
+	void SetBiosDirKey(char *fileName);
+	std::string GetBiosDirKey();
 
 	HKEY hParentKey;
 	HKEY hCurBiosFileKey;
+	HKEY hBiosDirectory;
 
 	BOOL bBiosLoaded;
 	CPsx *psx;

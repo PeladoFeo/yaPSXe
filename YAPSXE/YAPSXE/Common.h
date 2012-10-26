@@ -15,6 +15,8 @@
 #include <vector>
 #include <time.h>
 #include <gl\glew.h>
+#include <shlobj.h>
+#include <objbase.h>
 
 //#define GLOBAL_DISABLE_CSL_OUT
 

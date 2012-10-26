@@ -141,6 +141,8 @@ BOOL CGLRenderer::InitOpenGLWindow(CWindow *wnd) {
 	}
 
 	if (!CreateFrameBufferObject(CGpu::VRAM_WIDTH, CGpu::VRAM_HEIGHT)) {
+		MessageBox(CPsx::GetInstance()->mMainWnd->GetHwnd(), 
+			"OpenGL FBO extensions unsupported", "Error", MB_ICONERROR);
 		return FALSE;
 	}
 
@@ -188,7 +190,6 @@ BOOL CGLRenderer::CreateFrameBufferObject(int width, int height) {
 	switch(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT)) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return TRUE;
-	
 		default:
 			return FALSE;
 	}
