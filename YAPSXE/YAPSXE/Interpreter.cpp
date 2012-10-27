@@ -84,6 +84,7 @@ void CInterpreter::Execute() {
 			//Sleep(10);
 		}
 #endif
+		/* keep ticking regardless of the cpu state */
 		CheckInterrupts();
 		cpu->cycles += 1;
 		cpu->mTotalCycles += 1;

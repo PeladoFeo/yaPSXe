@@ -234,11 +234,6 @@ void CGLRenderer::RenderFrameBufferObject() {
 
 	SwapBuffers(glWindow->hDC);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_TEXTURE_2D);
-
 	// switch back to rendering to textures
 	glBindFramebufferEXT(GL_FRAMEBUFFER, mFboID); 
 }

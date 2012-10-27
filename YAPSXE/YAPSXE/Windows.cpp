@@ -177,6 +177,7 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				case IDM_EMULATION_RESET:
 					psx->ResetPsx();
+					psx->ClearVram();
 					psx->Execute();
 					break;
 

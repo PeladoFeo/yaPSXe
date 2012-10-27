@@ -26,6 +26,7 @@ public:
 	BOOL RestoreSaveStateFile(const char *path);
 	void GetVramImage(u16 *image);
 	void SetVramImage(u16 *image);
+	void ClearVram();
 
 	CMemory *mem;
 	CpuState *cpu;

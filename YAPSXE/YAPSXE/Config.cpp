@@ -178,11 +178,10 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 					long res = Button_GetCheck(GetDlgItem(hDlg, IDC_LIMIT_FPS_CHECK));
 					if(res == BST_CHECKED) {
 						psx->conf->bLimitFps = TRUE;
-						psx->conf->SetLimitFpsKey(TRUE);
 					} else if(res == BST_UNCHECKED) {
 						psx->conf->bLimitFps = FALSE;
-						psx->conf->SetLimitFpsKey(FALSE);
 					}
+					psx->conf->SetLimitFpsKey(psx->conf->bLimitFps);
 
 					/* 
 						handle bios related stuff 
@@ -274,7 +273,7 @@ BOOL Config::OpenRegistryKeys() {
 		SetBiosDirKey("BIOS"); // default BIOS directory path
 	}
 
-	/* current bios directory key */
+	/* LimitFPS directory key */
 	if (RegOpenKeyEx( hParentKey, "LimitFPS", 0, 
 					  KEY_ALL_ACCESS, &hLimitFpsKey) != ERROR_SUCCESS) {
 		if (RegCreateKeyEx( hParentKey, "LimitFps", 0, 0, REG_OPTION_NON_VOLATILE, 

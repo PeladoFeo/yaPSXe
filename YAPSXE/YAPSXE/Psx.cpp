@@ -49,8 +49,6 @@ CPsx::~CPsx() {
 	// must stop the emulation thread first
 	SuspendThread(mEmuThread);
 
-	/* the order that these are deleted in matters. 
-	   don't touch. */
 	if (conf) {
 		delete conf; 
 		conf = 0;
@@ -169,17 +167,19 @@ void CPsx::ResetPsx() {
 void CPsx::GetVramImage(u16 *image) {
 	gpu->mVramImagePtr = image;
 	gpu->mSaveVram = TRUE;
-	cpu->SetCpuState(PSX_CPU_RUNNING);
 	while (gpu->mSaveVram) Sleep(50);
-	cpu->SetCpuState(PSX_CPU_HALTED);
 }
 
 void CPsx::SetVramImage(u16 *image) {
 	gpu->mVramImagePtr = image;
 	gpu->mRestoreVram = TRUE;
-	cpu->SetCpuState(PSX_CPU_RUNNING);
 	while (gpu->mRestoreVram) Sleep(50);
-	cpu->SetCpuState(PSX_CPU_HALTED);
+}
+
+void CPsx::ClearVram() {
+	static u16 mem[1024*512];
+	memset(mem,0,1024*512*sizeof(u16));
+	SetVramImage(mem);
 }
 
 static const char const *gSaveStateID = "PSX-SAVE-STATE-FILE";
