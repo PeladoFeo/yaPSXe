@@ -361,7 +361,8 @@ u32 CheckSum(u8 *data, u32 size) {
 
 BOOL CMemory::LoadBiosRom(std::string path) {
 	std::ifstream biosrom;
-
+	static CPsx *psx = CPsx::GetInstance();
+	
 	biosrom.open(path.c_str(), std::ios::in | std::ios::binary);
 	if (!biosrom.is_open()) {
 		MessageBox(NULL, "Failed to open BIOS ROM", "Error", MB_ICONERROR);
@@ -386,7 +387,7 @@ BOOL CMemory::LoadBiosRom(std::string path) {
 
 	for (u32 i = 0; gBiosData[i].checksum != terminator; i++) {
 		if (gBiosData[i].checksum == checksum) {
-			CPsx::GetInstance()->mCurBios = &gBiosData[i];
+			psx->mCurBios = &gBiosData[i];
 			csl->out(CWHITE, "BIOS %s detected (checksum: 0x%x)\n", 
 				gBiosData[i].name, checksum);
 
