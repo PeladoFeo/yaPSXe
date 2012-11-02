@@ -1026,6 +1026,8 @@ void CGpu::CheckVramTransferRequest() {
 void CGpu::UpdateScreen() {
 	CheckVramTransferRequest();
 
+	// check if display is enabled?
+	
 	gl->RenderFrameBufferObject();
 
 	glViewport(0,0, gl->mFboWidth, gl->mFboHeight);
