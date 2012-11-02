@@ -360,9 +360,9 @@ void CWindow::ProcessMessages() {
 
 static BOOL CreateMainWindows(CPsx *psx) {
 #if defined (_DEBUG) 
-	char *title = "YAPSXE (debug build)";
+	char *title = "yaPSXe (debug build)";
 #elif defined (NDEBUG)
-	char *title = "YAPSXE (release build)";
+	char *title = "yaPSXe (release build)";
 #endif
 	HMENU hSubMenu;
 
