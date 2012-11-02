@@ -128,6 +128,7 @@ void CInterpreter::ExecuteInstruction() {
 	LogBiosCall();
 #endif
 
+	// instruction reads could be done faster 
 	cpu->PsxOp.full = mem->Read32(cpu->pc);
 
 #if defined (LOG_CPU_EXEC)
