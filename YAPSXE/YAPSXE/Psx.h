@@ -20,8 +20,9 @@
 
 #include "Common.h"
 
-#define HSYNC   (CPsx::CPU_CLOCK/15734)
-#define VSYNC   (CPsx::CPU_CLOCK/60)
+#define HSYNC   	(CPsx::CPU_CLOCK/15734)
+#define VBL_START	(HSYNC*240)
+#define VBL_END		(HSYNC*262)
 
 void EmulationThreadEntryFunc(); 
 

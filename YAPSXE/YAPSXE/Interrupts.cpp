@@ -52,11 +52,11 @@ void CpuState::Exception(u32 code) {
 }
 
 void CInterpreter::CheckInterrupts() {
-	if (cpu->cycles >= (HSYNC*240)) {
+	if (cpu->cycles >= VBL_START) {
 		mem->mIREG |= VBL_INTR;
 	}
 
-	if (cpu->cycles >= (HSYNC*262)) {
+	if (cpu->cycles >= VBL_END) {
 		cpu->cycles = 0;
 
 		gpu->UpdateScreen();
