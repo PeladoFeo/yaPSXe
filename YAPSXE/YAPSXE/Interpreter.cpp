@@ -36,13 +36,10 @@
 #include "CpuDebugger.h"
 #endif
 
-#if 0
-#define LOG_CPU_EXEC
-#endif
 
-#if 0
-#define LOG_BIOS_CALLS
-#endif
+//#define LOG_CPU_EXEC
+//#define LOG_BIOS_CALLS
+#define LOG_PSX_BIOS_OUTPUT
 
 
 CInterpreter::CInterpreter() {
@@ -124,6 +121,14 @@ void CInterpreter::LogBiosCall() {
 }
 
 void CInterpreter::ExecuteInstruction() {
+#if defined (LOG_PSX_BIOS_OUTPUT)
+	// catch calls to putchar
+	int addr = cpu->pc & 0x1fffff, op = cpu->GPR[9] & 0xff;
+	if (addr == 0xb0 && op == 0x3d) {
+		psx->csl->out(CCYAN, "%c", psx->cpu->GPR[4] & 0xff);
+	}
+#endif
+
 #if defined (LOG_BIOS_CALLS)
 	LogBiosCall();
 #endif

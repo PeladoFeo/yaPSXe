@@ -78,6 +78,7 @@ void CpuDebugger::HandleDasmRightClick(int x, int y) {
 void CpuDebugger::OpenDebugger() {
 	mmMainWnd->ShowWnd(TRUE);
 	mDasmStartAddr = psx->cpu->pc;
+	mMemoryViewAddr = psx->cpu->pc;
 	psx->cpu->SetCpuState(PSX_CPU_STEPPING);
 	UpdateDebugger();
 }
@@ -187,6 +188,9 @@ void CpuDebugger::DrawDasmWindow() {
 		/* change the starting address to disassemble from if necessary */
 		if (psx->cpu->pc < mDasmStartAddr || psx->cpu->pc > ( mDasmStartAddr + ((height/charHeight-1)*4) )) {
 			mDasmStartAddr = psx->cpu->pc;
+			mMemoryViewAddr = psx->cpu->pc;
+			UpdateWindow(mChildMem->GetHwnd());
+			InvalidateRect(mChildMem->GetHwnd(), NULL, TRUE);
 		}
 	}
 
