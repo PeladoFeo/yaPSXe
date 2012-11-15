@@ -381,7 +381,7 @@ static BOOL CreateMainWindows(Psx *psx) {
 	EnableMenuItem(psx->mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_BYCOMMAND | MF_GRAYED);
 	psx->mMainWnd->AddMenuSeperator(hSubMenu);
 	psx->mMainWnd->AddMenuItem(hSubMenu, IDM_EMULATION_EXIT, "&Exit");
-	hSubMenu = psx->mMainWnd->PopupMenuCreate("&PsxConfig");
+	hSubMenu = psx->mMainWnd->PopupMenuCreate("&Config");
 	psx->mMainWnd->AddMenuItem(hSubMenu, IDM_CONFIG_CONFIGURE, "&Configure");
 #if defined (_DEBUG)
 	hSubMenu = psx->mMainWnd->PopupMenuCreate("&Debug");	
