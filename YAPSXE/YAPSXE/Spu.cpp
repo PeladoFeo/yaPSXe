@@ -28,7 +28,7 @@ PsxSpu::PsxSpu() {
 }
 
 void PsxSpu::InitClassPointers() {
-	csl = CPsx::GetInstance()->csl;
+	csl = Psx::GetInstance()->csl;
 }
 
 void PsxSpu::InitSpu() {

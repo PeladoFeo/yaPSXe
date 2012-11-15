@@ -243,7 +243,7 @@ u32 PsxMemory::HwRead32(u32 addr) {
 #if defined (LOG_MEM_HW_READ32)
 			//csl->out(CWHITE, "IREG 32-bit read\n");
 #endif
-			//CPsx::GetInstance()->mCpuDbg->OpenDebugger();
+			//Psx::GetInstance()->mCpuDbg->OpenDebugger();
 			//cpu->SetPsxCpu(PSX_CPU_STEPPING);
 			return mIREG;
 

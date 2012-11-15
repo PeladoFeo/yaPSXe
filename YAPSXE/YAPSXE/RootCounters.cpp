@@ -23,32 +23,32 @@
 	todo
 */
 
-RootCounters::RootCounters() {
+PsxCounters::PsxCounters() {
 }
 
-void RootCounters::InitClassPointers() {
-	psx = CPsx::GetInstance();
+void PsxCounters::InitClassPointers() {
+	psx = Psx::GetInstance();
 	csl = psx->csl;
 }
 
-u32 RootCounters::ReadCurrent(int n) {
+u32 PsxCounters::ReadCurrent(int n) {
 	return 0;
 }
 
-u32 RootCounters::ReadMode(int n) {
+u32 PsxCounters::ReadMode(int n) {
 	return 0;
 }
 
-u32 RootCounters::ReadTarget(int n) {
+u32 PsxCounters::ReadTarget(int n) {
 	return 0;
 }
 
-void RootCounters::WriteCurrent(int n, u32 data) {
+void PsxCounters::WriteCurrent(int n, u32 data) {
 	count[n] = data;
 }
 
-void RootCounters::WriteMode(int n, u32 data) {
+void PsxCounters::WriteMode(int n, u32 data) {
 }
 
-void RootCounters::WriteTarget(int n, u32 data) {
+void PsxCounters::WriteTarget(int n, u32 data) {
 }

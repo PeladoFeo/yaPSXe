@@ -37,10 +37,10 @@ enum {
 
 void DebuggerThreadEntryFunc();
 
-class CpuDebugger {
+class PsxCpuDebugger {
 public:
-	CpuDebugger();
-	~CpuDebugger();
+	PsxCpuDebugger();
+	~PsxCpuDebugger();
 
 	void OpenDebugger();
 	void UpdateDebugger();
@@ -53,12 +53,12 @@ public:
 	HANDLE mCpuDbgThread;
 	DWORD mCpuDbgThreadId;
 
-	CPsx *psx;
+	Psx *psx;
 
-	CWindow *mmMainWnd;
-	CWindow *mChildDasm;
-	CWindow *mChildRegs;
-	CWindow *mChildMem;
+	Window *mmMainWnd;
+	Window *mChildDasm;
+	Window *mChildRegs;
+	Window *mChildMem;
 
 	u32 mMemoryViewAddr;
 
@@ -86,7 +86,7 @@ public:
 		static const char *sCp0RegNames[] = {
 		"Index"     , "Random"    , "EntryLo0", "EntryLo1", "Context" , "PageMask"  , "Wired"     , "*Check me*",
 		"BadVAddr"  , "Count"     , "EntryHi" , "Compare" , "Status"  , "Cause"     , "ExceptPC"  , "PRevID"    ,
-		"Config"    , "LLAddr"    , "WatchLo" , "WatchHi" , "XContext", "*RES*"     , "*RES*"     , "*RES*"     ,
+		"PsxConfig"    , "LLAddr"    , "WatchLo" , "WatchHi" , "XContext", "*RES*"     , "*RES*"     , "*RES*"     ,
 		"*RES*"     , "*RES* "    , "PErr"    , "CacheErr", "TagLo"   , "TagHi"     , "ErrorEPC"  , "*RES*"     
 		};
 		return (char*)sCp0RegNames[index];

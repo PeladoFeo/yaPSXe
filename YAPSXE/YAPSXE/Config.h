@@ -30,17 +30,17 @@ struct ConfigBiosFiles {
 	char fileName[MAX_PATH];
 };
 
-class Config {
+class PsxConfig {
 public:
-	Config();
-	~Config();
+	PsxConfig();
+	~PsxConfig();
 
 	BOOL OpenRegistryKeys();
 
 	static BOOL IsValidBiosFile(std::string path, const BiosInfo **info);
 	static std::vector<ConfigBiosFiles> GetValidBiosFileNamesInDir(std::string directory);
 
-	static void RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFiles, CPsx *psx);
+	static void RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFiles, Psx *psx);
 
 	static const std::string regions[];
 	std::string mBiosDirectoryPath;
@@ -60,7 +60,7 @@ public:
 	BOOL bLimitFps;
 
 	BOOL bBiosLoaded;
-	CPsx *psx;
+	Psx *psx;
 };
 
 #endif /* CONFIG_H */

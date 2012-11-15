@@ -16,18 +16,18 @@
  */
 
 
-#ifndef CBreakpoints_H
-#define CBreakpoints_H
+#ifndef PsxBreakpoints_H
+#define PsxBreakpoints_H
 
 #include "Common.h"
 
-class CBreakpoints {
+class PsxBreakpoints {
 public:
 	void AddBreakpoint(u32 addr);
 	void RemoveBreakpoint(u32 addr);
 	BOOL CheckBreakpoint(u32 addr);
 
-	std::vector<u32> vBreakpoints;
+	std::vector<u32> vPsxBreakpoints;
 };
 
-#endif /* CBreakpoints_H */
+#endif /* PsxBreakpoints_H */

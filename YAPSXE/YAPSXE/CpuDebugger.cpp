@@ -29,13 +29,13 @@
 #include "CpuDebugger.h"
 
 
-CpuDebugger::CpuDebugger() {
-	psx = CPsx::GetInstance();
+PsxCpuDebugger::PsxCpuDebugger() {
+	psx = Psx::GetInstance();
 
-	mmMainWnd = new CWindow;
-	mChildDasm = new CWindow;
-	mChildRegs = new CWindow;
-	mChildMem = new CWindow;
+	mmMainWnd = new Window;
+	mChildDasm = new Window;
+	mChildRegs = new Window;
+	mChildMem = new Window;
 
 	mDasmStartAddr = 0;
 	mMemoryViewAddr = /*0xbfc00000*/0x1000;
@@ -47,14 +47,14 @@ CpuDebugger::CpuDebugger() {
 							"Courier New");
 }
 
-CpuDebugger::~CpuDebugger() {
+PsxCpuDebugger::~PsxCpuDebugger() {
 	delete mmMainWnd;
 	delete mChildDasm;
 	delete mChildRegs;
 	delete mChildMem;
 }
 
-void CpuDebugger::HandleDasmRightClick(int x, int y) {
+void PsxCpuDebugger::HandleDasmRightClick(int x, int y) {
 	POINT ptCursorPos;
 	GetCursorPos(&ptCursorPos);
 
@@ -64,9 +64,9 @@ void CpuDebugger::HandleDasmRightClick(int x, int y) {
 	HMENU hPopupMenu = CreatePopupMenu();
 	AppendMenu(hPopupMenu, MF_STRING, IDM_DBG_CTX_SETPC, "Set PC");
 	AppendMenu(hPopupMenu, MF_STRING, IDM_DBG_CTX_CHECK_BP, 
-		(!psx->mPCBreakpoints->CheckBreakpoint(mDasmStartAddr + ((y/14)*4)) ? 
+		(!psx->mPPsxBreakpoints->CheckBreakpoint(mDasmStartAddr + ((y/14)*4)) ? 
 		"Add breakpoint" : "Remove breakpoint"));
-	if (psx->mPCBreakpoints->vBreakpoints.size() > 0)
+	if (psx->mPPsxBreakpoints->vPsxBreakpoints.size() > 0)
 		AppendMenu(hPopupMenu, MF_STRING, IDM_DBG_CTX_REM_ALL_BP, "Remove all breakpoints");
 
 	TrackPopupMenu(hPopupMenu, 0, ptCursorPos.x, ptCursorPos.y, 0, mChildDasm->GetHwnd(), 0);
@@ -75,7 +75,7 @@ void CpuDebugger::HandleDasmRightClick(int x, int y) {
 	UpdateDebugger();
 }
 
-void CpuDebugger::OpenDebugger() {
+void PsxCpuDebugger::OpenDebugger() {
 	mmMainWnd->ShowWnd(TRUE);
 	mDasmStartAddr = psx->cpu->pc;
 	mMemoryViewAddr = psx->cpu->pc;
@@ -83,7 +83,7 @@ void CpuDebugger::OpenDebugger() {
 	UpdateDebugger();
 }
 
-void CpuDebugger::UpdateDebugger() {
+void PsxCpuDebugger::UpdateDebugger() {
 	UpdateWindow(mmMainWnd->GetHwnd());
 	InvalidateRect(mmMainWnd->GetHwnd(), 0, TRUE);
 
@@ -97,7 +97,7 @@ void CpuDebugger::UpdateDebugger() {
 	InvalidateRect(mChildMem->GetHwnd(), 0, TRUE);
 }
 
-void CpuDebugger::StepDebugger() {
+void PsxCpuDebugger::StepDebugger() {
 	psx->interpreter->bDoStep = TRUE;
 	while (!psx->interpreter->bDoStep) Sleep(10);
 }
@@ -107,7 +107,7 @@ void SizeWindow(HWND hwnd, int width, int height) {
 }
 
 LRESULT CpuWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
 
     switch(msg) {
 		case WM_CREATE: {
@@ -171,8 +171,8 @@ LRESULT CpuWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-void CpuDebugger::DrawDasmWindow() {
-	static CPsx *psx = CPsx::GetInstance();
+void PsxCpuDebugger::DrawDasmWindow() {
+	static Psx *psx = Psx::GetInstance();
 
 	mChildDasm->hDC = BeginPaint(mChildDasm->GetHwnd(), &mChildDasm->ps);
 
@@ -200,7 +200,7 @@ void CpuDebugger::DrawDasmWindow() {
 
 	for (int i = 0; i < height/charHeight+1; i++, pc += 4) {
 		op.full = psx->mem->Read32(pc);
-		sprintf_s(str, 256, "%08x %s", pc, CpuDebugger::DasmOne(op,pc));
+		sprintf_s(str, 256, "%08x %s", pc, PsxCpuDebugger::DasmOne(op,pc));
 
 		if (pc == psx->cpu->pc) {
 			RECT TextRect = { 0, (i*charHeight), width, (i*charHeight)+charHeight+2 };
@@ -208,7 +208,7 @@ void CpuDebugger::DrawDasmWindow() {
 			SetBkColor(hDC, RGB(200,200,250));
 			ExtTextOut(hDC, 4, i*charHeight, ETO_OPAQUE, &TextRect, str, strlen(str), 0);
 		} else {
-			if (psx->mPCBreakpoints->CheckBreakpoint(mDasmStartAddr+(i*4))) {
+			if (psx->mPPsxBreakpoints->CheckBreakpoint(mDasmStartAddr+(i*4))) {
 				RECT TextRect = { 0, (i*charHeight), 71, (i*charHeight)+charHeight+2 };
 				SetBkColor(hDC, RGB(255,0,0));
 				ExtTextOut(hDC, 4, i*charHeight, ETO_OPAQUE, &TextRect, "", 0, 0);
@@ -229,7 +229,7 @@ void CpuDebugger::DrawDasmWindow() {
 }
 
 LRESULT CpuDasmWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
 
     switch(msg) {
 		case WM_CREATE:
@@ -251,7 +251,7 @@ LRESULT CpuDasmWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case WM_PAINT: {
-			if (CPsx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
+			if (Psx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
 				psx->mCpuDbg->DrawDasmWindow();
 			}
 		} break;
@@ -266,7 +266,7 @@ LRESULT CpuDasmWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 	//		RECT rect;
 	//		GetWindowRect(hWnd, &rect);
-	//		CPsx::GetInstance()->csl->out("size: %d %d\n", rect.right-rect.left, rect.bottom-rect.top);
+	//		Psx::GetInstance()->csl->out("size: %d %d\n", rect.right-rect.left, rect.bottom-rect.top);
 			break;
 
 		case WM_COMMAND: {
@@ -280,17 +280,17 @@ LRESULT CpuDasmWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				case IDM_DBG_CTX_CHECK_BP: {
 					u32 addr = (psx->mCpuDbg->mDasmStartAddr + ((psx->mCpuDbg->mDasmRclickYpos/14)*4));
 
-					if (!psx->mPCBreakpoints->CheckBreakpoint(addr)) {
-						psx->mPCBreakpoints->AddBreakpoint(addr);
+					if (!psx->mPPsxBreakpoints->CheckBreakpoint(addr)) {
+						psx->mPPsxBreakpoints->AddBreakpoint(addr);
 					} else {
-						psx->mPCBreakpoints->RemoveBreakpoint(addr);
+						psx->mPPsxBreakpoints->RemoveBreakpoint(addr);
 					}
 
 					psx->mCpuDbg->UpdateDebugger();
 				} break;
 
 				case IDM_DBG_CTX_REM_ALL_BP: {
-					psx->mPCBreakpoints->vBreakpoints.clear();
+					psx->mPPsxBreakpoints->vPsxBreakpoints.clear();
 					psx->mCpuDbg->UpdateDebugger();
 				} break;
 			}
@@ -314,7 +314,7 @@ static void AppendTabItem(HWND hTab, char *text) {
 }
 
 LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CpuDebugger *dbg = CPsx::GetInstance()->mCpuDbg;
+	static PsxCpuDebugger *dbg = Psx::GetInstance()->mCpuDbg;
 
     switch(msg) {
 		case WM_CREATE:
@@ -325,7 +325,7 @@ LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 										0, 0, 
 										dbg->mChildRegs->width, 
 										dbg->mChildRegs->height, 
-										hWnd, 0, CPsx::GetInstance()->hInst, 0);
+										hWnd, 0, Psx::GetInstance()->hInst, 0);
 			AppendTabItem(dbg->hRegTabCtrl, "CPU");
 			AppendTabItem(dbg->hRegTabCtrl, "COP0");
 			SendMessage(dbg->hRegTabCtrl, WM_SETFONT, WPARAM (dbg->mDasmFont), TRUE);
@@ -340,7 +340,7 @@ LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case WM_PAINT: {
-			if (CPsx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
+			if (Psx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
 				HDC hTabDC = GetDC(dbg->hRegTabCtrl);
 
 				static int charHeight = 14;
@@ -357,7 +357,7 @@ LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 								j = 0;
 								x = 120;
 							}
-							sprintf_s(str, 256, "%s: %08x", CpuDebugger::GetGprRegName(i), CPsx::GetInstance()->cpu->GPR[i]);
+							sprintf_s(str, 256, "%s: %08x", PsxCpuDebugger::GetGprRegName(i), Psx::GetInstance()->cpu->GPR[i]);
 							TextOut(hTabDC, x, j*charHeight+30, str, strlen(str));
 						}
 					} break;
@@ -388,7 +388,7 @@ LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-u8 CpuDebugger::DebugCpuReadByte(u32 addr) {
+u8 PsxCpuDebugger::DebugCpuReadByte(u32 addr) {
 	if (addr < 0x00200000) {
 		return psx->mem->RAM[addr];
 	} else if (addr >= 0x1f800000 && addr <= 0x1f8003ff) {
@@ -407,7 +407,7 @@ u8 CpuDebugger::DebugCpuReadByte(u32 addr) {
 }
 
 LRESULT CpuMemoryWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CpuDebugger *dbg = CPsx::GetInstance()->mCpuDbg;
+	static PsxCpuDebugger *dbg = Psx::GetInstance()->mCpuDbg;
 
     switch(msg) {
 		case WM_CREATE:
@@ -420,7 +420,7 @@ LRESULT CpuMemoryWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			break;
 
 		case WM_PAINT: {
-			if (CPsx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
+			if (Psx::GetInstance()->cpu->state != PSX_CPU_RUNNING) {
 				dbg->mChildMem->hDC = BeginPaint(hWnd, &dbg->mChildMem->ps);
 
 				static char str[256];
@@ -482,11 +482,11 @@ LRESULT CpuMemoryWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 void DebuggerThreadEntryFunc() {
-	CpuDebugger *dbg = CPsx::GetInstance()->mCpuDbg;
+	PsxCpuDebugger *dbg = Psx::GetInstance()->mCpuDbg;
 
 	if (!dbg->mmMainWnd->WindowCreate("Debugger", "ClassNamemCpuDbg", 860, 818, 
 			FALSE,FALSE, CpuWndProc, RGB(171,171,171))) {
-		CPsx::GetInstance()->SignalQuit();
+		Psx::GetInstance()->SignalQuit();
 		return;
 	}
 	HMENU hSubMenu = dbg->mmMainWnd->PopupMenuCreate("&Action");
@@ -498,26 +498,26 @@ void DebuggerThreadEntryFunc() {
 	if (!dbg->mChildDasm->WindowCreate("Dasm", "ClassNamemCpuDbgDasm", 
 			310, 760, FALSE, TRUE, CpuDasmWndProc, RGB(255,255,255), TRUE, 
 			dbg->mmMainWnd->GetHwnd())) {
-		CPsx::GetInstance()->SignalQuit();
+		Psx::GetInstance()->SignalQuit();
 		return;
 	}
 
 	if (!dbg->mChildRegs->WindowCreate("Registers", "ClassNamemCpuDbgRegs", 
 			242, 330, FALSE, TRUE, CpuRegWndProc, RGB(255,255,255), TRUE, 
 			dbg->mmMainWnd->GetHwnd(), WS_CLIPCHILDREN)) {
-		CPsx::GetInstance()->SignalQuit();
+		Psx::GetInstance()->SignalQuit();
 		return;
 	}
 
 	if (!dbg->mChildRegs->WindowCreate("Memory", "ClassNamemCpuDbgMemory", 
 			537, 431, FALSE, TRUE, CpuMemoryWndProc, RGB(255,255,255), TRUE, 
 			dbg->mmMainWnd->GetHwnd())) {
-		CPsx::GetInstance()->SignalQuit();
+		Psx::GetInstance()->SignalQuit();
 		return;
 	}
 
 	for (;;) {
-		CWindow::ProcessMessages();
+		Window::ProcessMessages();
 		Sleep(10);
 	}
 }

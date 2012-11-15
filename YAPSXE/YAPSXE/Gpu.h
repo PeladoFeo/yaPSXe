@@ -157,8 +157,8 @@ public:
 	VertexT vtxt[4];
 
 	Console *csl;
-	CGLRenderer *gl;
-	CPsx *psx;
+	PsxGLRenderer *gl;
+	Psx *psx;
 };
 
 #endif /* GPU_H */

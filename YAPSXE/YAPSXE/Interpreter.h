@@ -157,7 +157,7 @@ public:
 	static PsxCpuInstruction psxCP2[64];
 	static PsxCpuInstruction psxCP2BSC[32];
 
-	CPsx *psx;
+	Psx *psx;
 	static PsxCpu *cpu;
 	static PsxMemory *mem;
 	PsxGpu *gpu;

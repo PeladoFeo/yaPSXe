@@ -59,7 +59,7 @@ PsxInterpreter::~PsxInterpreter() {
 }
 
 void PsxInterpreter::InitClassPointers() {
-	psx = CPsx::GetInstance();
+	psx = Psx::GetInstance();
 	cpu = psx->cpu;
 	mem = psx->mem;
 	gpu = psx->gpu;
@@ -67,7 +67,7 @@ void PsxInterpreter::InitClassPointers() {
 }
 
 void PsxInterpreter::Execute() {
-	CPsx *psx = CPsx::GetInstance();
+	Psx *psx = Psx::GetInstance();
 	for (;;) {
 #if defined(_DEBUG)
 		switch (cpu->state) {
@@ -81,7 +81,7 @@ void PsxInterpreter::Execute() {
 			} break;
 
 			case PSX_CPU_RUNNING: {
-				if (psx->mPCBreakpoints->CheckBreakpoint(cpu->pc)) {
+				if (psx->mPPsxBreakpoints->CheckBreakpoint(cpu->pc)) {
 					psx->csl->out(CRED, "Breakpoint detected @ 0x%08X\n", cpu->pc);
 					cpu->SetPsxCpu(PSX_CPU_STEPPING);
 					psx->mCpuDbg->OpenDebugger();
@@ -139,7 +139,7 @@ void PsxInterpreter::ExecuteInstruction() {
 
 #if defined (LOG_CPU_EXEC)
 	if (bCpuTraceLog) {
-		fprintf(fout, "%08x: %s\n", cpu->pc, CpuDebugger::DasmOne(cpu->PsxOp, cpu->pc));
+		fprintf(fout, "%08x: %s\n", cpu->pc, PsxCpuDebugger::DasmOne(cpu->PsxOp, cpu->pc));
 		fflush(fout);
 	}
 #endif

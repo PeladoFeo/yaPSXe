@@ -118,6 +118,7 @@
     <ClInclude Include="OpenGL.h" />
     <ClInclude Include="Psx.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RootCounters.h" />
     <ClInclude Include="Spu.h" />
     <ClInclude Include="Windows.h" />
   </ItemGroup>

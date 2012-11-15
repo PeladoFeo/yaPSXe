@@ -29,9 +29,9 @@ PsxCpu::PsxCpu() {
 }
 
 void PsxCpu::InitClassPointers() {
-	csl = CPsx::GetInstance()->csl;
-	gpu = CPsx::GetInstance()->gpu;
-	spu = CPsx::GetInstance()->spu;
+	csl = Psx::GetInstance()->csl;
+	gpu = Psx::GetInstance()->gpu;
+	spu = Psx::GetInstance()->spu;
 }
 
 void PsxCpu::Reset() {

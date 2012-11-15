@@ -40,12 +40,12 @@ extern PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC	glGetFramebufferAttachmen
 extern PFNGLGENERATEMIPMAPEXTPROC						glGenerateMipmapEXT;
 extern PFNGLDRAWBUFFERSPROC								glDrawBuffers;
 
-class CGLRenderer {
+class PsxGLRenderer {
 public:
-	CGLRenderer();
-	~CGLRenderer();
+	PsxGLRenderer();
+	~PsxGLRenderer();
 
-	BOOL InitOpenGLWindow(CWindow *wnd);
+	BOOL InitOpenGLWindow(Window *wnd);
 	void DestroyOpenGL();
 
 	BOOL CreateFrameBufferObject(int width, int height);
@@ -67,7 +67,7 @@ public:
 	BOOL mInitialised;
 
 //private:
-	CWindow *glWindow;
+	Window *glWindow;
 	Console *csl;
 };
 

@@ -93,18 +93,18 @@ PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxCP2BSC[32] = {
 
 void PsxInterpreter::unimplemented() {
 #if defined (_DEBUG)
-	char *pstr = CpuDebugger::DasmOne(cpu->PsxOp,cpu->pc);
+	char *pstr = PsxCpuDebugger::DasmOne(cpu->PsxOp,cpu->pc);
 	int i = 0; 
 	while (pstr[i] != ' ' && i < strlen(pstr)) i++; 
 	pstr[i] = '\0';
-	CPsx::GetInstance()->csl->out(CRED, "Unimplemented instruction '%s'\n", pstr);
+	Psx::GetInstance()->csl->out(CRED, "Unimplemented instruction '%s'\n", pstr);
 	cpu->SetPsxCpu(PSX_CPU_STEPPING);
-	CPsx::GetInstance()->mCpuDbg->OpenDebugger();
+	Psx::GetInstance()->mCpuDbg->OpenDebugger();
 #endif
 }
 
 void PsxInterpreter::psxNULL() {
-	CPsx::GetInstance()->csl->out(CRED, "Unknown instruction @ 0x%08x\n", cpu->pc);
+	Psx::GetInstance()->csl->out(CRED, "Unknown instruction @ 0x%08x\n", cpu->pc);
 }
 
 void PsxInterpreter::psxSPECIAL() {

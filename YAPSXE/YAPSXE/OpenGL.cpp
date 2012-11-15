@@ -46,11 +46,11 @@ PFNGLDRAWBUFFERSPROC							glDrawBuffers = 0;
 		static char str[256]; \
 		sprintf(str, "Failed to load OpenGL extension '%s'", #name); \
 		MessageBox(0, str, "ERROR", MB_ICONERROR);\
-		CPsx::GetInstance()->SignalQuit();\
+		Psx::GetInstance()->SignalQuit();\
 	}
 
-CGLRenderer::CGLRenderer() {
-	csl = CPsx::GetInstance()->csl;
+PsxGLRenderer::PsxGLRenderer() {
+	csl = Psx::GetInstance()->csl;
 
 	// must be called before using glew functions
 	glewInit();
@@ -61,11 +61,11 @@ CGLRenderer::CGLRenderer() {
 	mInitialised = FALSE;
 }
 
-CGLRenderer::~CGLRenderer() {
+PsxGLRenderer::~PsxGLRenderer() {
 	DestroyOpenGL();
 }
 
-void CGLRenderer::DestroyOpenGL() {
+void PsxGLRenderer::DestroyOpenGL() {
 	wglMakeCurrent(0,0);			
 	wglDeleteContext(hRC);		
 	if (glWindow) {
@@ -77,7 +77,7 @@ void CGLRenderer::DestroyOpenGL() {
 	}
 }
 
-BOOL CGLRenderer::InitOpenGLWindow(CWindow *wnd) {
+BOOL PsxGLRenderer::InitOpenGLWindow(Window *wnd) {
 	glWindow = wnd;
 	u32	pixelFormat;	
 
@@ -158,7 +158,7 @@ BOOL CGLRenderer::InitOpenGLWindow(CWindow *wnd) {
 	}
 
 	if (!CreateFrameBufferObject(PsxGpu::VRAM_WIDTH, PsxGpu::VRAM_HEIGHT)) {
-		MessageBox(CPsx::GetInstance()->mMainWnd->GetHwnd(), 
+		MessageBox(Psx::GetInstance()->mMainWnd->GetHwnd(), 
 			"OpenGL FBO extensions unsupported", "Error", MB_ICONERROR);
 		return FALSE;
 	}
@@ -170,7 +170,7 @@ BOOL CGLRenderer::InitOpenGLWindow(CWindow *wnd) {
 	return TRUE;
 }
 
-BOOL CGLRenderer::CreateFrameBufferObject(int width, int height) {
+BOOL PsxGLRenderer::CreateFrameBufferObject(int width, int height) {
 	mFboWidth = width;
 	mFboHeight = height;
 
@@ -212,7 +212,7 @@ BOOL CGLRenderer::CreateFrameBufferObject(int width, int height) {
 	}
 }
 
-void CGLRenderer::RenderFrameBufferObject() {
+void PsxGLRenderer::RenderFrameBufferObject() {
 	// select the back buffer for rendering
     glBindFramebufferEXT(GL_FRAMEBUFFER, 0);  
 
@@ -269,8 +269,8 @@ static void GetMaxDispRes(int &width, int &height) {
 	height = maxh; 
 }
 
-void CGLRenderer::ToggleFullscreenMode() {
-	CPsx *psx = CPsx::GetInstance();
+void PsxGLRenderer::ToggleFullscreenMode() {
+	Psx *psx = Psx::GetInstance();
 
 	psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 

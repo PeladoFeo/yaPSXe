@@ -20,16 +20,16 @@
 
 #include "Common.h"
 
-#define HSYNC   	(CPsx::CPU_CLOCK/15734)
+#define HSYNC   	(Psx::CPU_CLOCK/15734)
 #define VBL_START	(HSYNC*240)
 #define VBL_END		(HSYNC*262)
 
 void EmulationThreadEntryFunc(); 
 
-class CPsx {
+class Psx {
 public:
-	CPsx();
-	~CPsx();
+	Psx();
+	~Psx();
 
 	void Execute();
 	void StartSaveStateEmulation(const char *filename);
@@ -52,15 +52,15 @@ public:
 	PsxSpu *spu;
 	Console *csl;
 	PsxInterpreter *interpreter;
-	CGLRenderer *gl;
-	RootCounters *rcnt;
+	PsxGLRenderer *gl;
+	PsxCounters *rcnt;
 
-	CWindow *mMainWnd;
-	CWindow *mDispWnd;
+	Window *mMainWnd;
+	Window *mDispWnd;
 	
 	const BiosInfo *mCurBios;
-	CBreakpoints *mPCBreakpoints;
-	Config *conf;
+	PsxBreakpoints *mPPsxBreakpoints;
+	PsxConfig *conf;
 
 
 	HINSTANCE hInst;
@@ -72,14 +72,14 @@ public:
 	static const u32 CPU_CLOCK = 33868800;
 
 #if defined (_DEBUG)
-	CpuDebugger *mCpuDbg;
+	PsxCpuDebugger *mCpuDbg;
 #endif
 
 	void SignalQuit();
 
 	// singleton
-	static CPsx *GetInstance() {
-		static CPsx instance;
+	static Psx *GetInstance() {
+		static Psx instance;
 		return &instance;
 	}
 };

@@ -49,11 +49,11 @@ PsxMemory::PsxMemory() {
 }
 
 void PsxMemory::InitClassPointers() {
-	rcnt = CPsx::GetInstance()->rcnt;
-	csl = CPsx::GetInstance()->csl;
-	cpu = CPsx::GetInstance()->cpu;
-	gpu = CPsx::GetInstance()->gpu;
-	spu = CPsx::GetInstance()->spu;
+	rcnt = Psx::GetInstance()->rcnt;
+	csl = Psx::GetInstance()->csl;
+	cpu = Psx::GetInstance()->cpu;
+	gpu = Psx::GetInstance()->gpu;
+	spu = Psx::GetInstance()->spu;
 }
 
 void PsxMemory::ResetMem() {
@@ -186,7 +186,7 @@ u32 PsxMemory::Read32(u32 addr) {
 		return *(u32*)&BIOS[addr & 0x7ffff];
 	} else {
 		//csl->out(CWHITE, "Unknown memory in Read32: 0x%08x\n", addr);
-		//CPsx::GetInstance()->cpu->SetPsxCpu(PSX_CPU_STEPPING);
+		//Psx::GetInstance()->cpu->SetPsxCpu(PSX_CPU_STEPPING);
 		//OpenDebugger();
 		return 0;
 	}

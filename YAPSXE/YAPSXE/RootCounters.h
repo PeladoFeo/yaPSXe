@@ -22,9 +22,9 @@
 #include "Common.h"
 #include "Psx.h"
 
-class RootCounters {
+class PsxCounters {
 public:
-	RootCounters();
+	PsxCounters();
 	void InitClassPointers();
 
 	u32 ReadCurrent(int n);
@@ -40,7 +40,7 @@ private:
 	u32 mode[4];
 	u32 target[4];
 
-	CPsx *psx;
+	Psx *psx;
 	Console *csl;
 };
 

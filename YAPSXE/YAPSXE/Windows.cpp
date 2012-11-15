@@ -32,7 +32,7 @@
 #include "CpuDebugger.h"
 #endif
 
-BOOL CWindow::OpenFileDlg(HWND hwnd, char *out, char *filter) {
+BOOL Window::OpenFileDlg(HWND hwnd, char *out, char *filter) {
 	if (!out) return FALSE;
 	OPENFILENAME ofn;
 
@@ -61,7 +61,7 @@ BOOL CWindow::OpenFileDlg(HWND hwnd, char *out, char *filter) {
  * Displays a directory selection dialog. CoInitialize must be called before calling this function.
  * szBuf must be MAX_PATH characters in length. hWnd may be 0.
  */
-BOOL CWindow::GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle) {
+BOOL Window::GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle) {
 	LPITEMIDLIST pidl     = 0;
 	BROWSEINFO   bi       = { 0 };
 	BOOL         bResult  = FALSE;
@@ -80,7 +80,7 @@ BOOL CWindow::GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle) {
 	return bResult;
 }
 
-BOOL CWindow::SaveFileDlg(HWND hWnd, char *out, char *filter) {
+BOOL Window::SaveFileDlg(HWND hWnd, char *out, char *filter) {
 	if (!out) return FALSE;
 	OPENFILENAME ofn;
 
@@ -105,10 +105,10 @@ BOOL CWindow::SaveFileDlg(HWND hWnd, char *out, char *filter) {
 } 
 
 LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
 	static  BOOL cursorhidden = FALSE;
 
-	if (CPsx::GetInstance()->mDispWnd->mFullscreen) {
+	if (Psx::GetInstance()->mDispWnd->mFullscreen) {
 		if (!cursorhidden) {
 			ShowCursor(FALSE);
 			cursorhidden = TRUE;
@@ -132,7 +132,7 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
         case WM_DESTROY:
             PostQuitMessage(0);
-			CPsx::GetInstance()->SignalQuit();
+			Psx::GetInstance()->SignalQuit();
 			break;
 
 		case WM_KEYDOWN: {
@@ -144,10 +144,10 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		} break;
 
 		case WM_SIZE:
-			CPsx::GetInstance()->mDispWnd->width = lParam & 0xffff;
-			CPsx::GetInstance()->mDispWnd->height = lParam >> 16;
-			if (CPsx::GetInstance()->gl->mInitialised) {
-				//glViewport(0, 0, CPsx::GetInstance()->mMainWnd->width, CPsx::GetInstance()->mMainWnd->height);
+			Psx::GetInstance()->mDispWnd->width = lParam & 0xffff;
+			Psx::GetInstance()->mDispWnd->height = lParam >> 16;
+			if (Psx::GetInstance()->gl->mInitialised) {
+				//glViewport(0, 0, Psx::GetInstance()->mMainWnd->width, Psx::GetInstance()->mMainWnd->height);
 			}
 			break;
 
@@ -158,7 +158,7 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
     switch(msg) {
 		case WM_COMMAND: {
 			switch(LOWORD(wParam)) {
@@ -173,7 +173,7 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				case IDM_EMULATION_LOAD_SAVESTATE: {
 					char path[MAX_PATH];
 					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
-					if (CWindow::OpenFileDlg(hwnd, path, 
+					if (Window::OpenFileDlg(hwnd, path, 
 						"Savestates (*.svt)\0*.svt\0All files (*.*)\0*.*\0\0")
 						) {
 						psx->StartSaveStateEmulation(path);
@@ -183,7 +183,7 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 				case IDM_EMULATION_CREATE_SAVESTATE: {
 					char path[MAX_PATH];
 					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
-					if (CWindow::SaveFileDlg(hwnd, path,
+					if (Window::SaveFileDlg(hwnd, path,
 						"All files (*.*)\0*.*\0\0")
 						) {
 						psx->CreateSaveStateFile(path);
@@ -241,8 +241,8 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		case WM_SIZE:
 			psx->mMainWnd->width = lParam & 0xffff;
 			psx->mMainWnd->height = lParam >> 16;
-			//if (CPsx::GetInstance()->gl->mInitialised) {
-				//glViewport(0, 0, CPsx::GetInstance()->mMainWnd->width, CPsx::GetInstance()->mMainWnd->height);
+			//if (Psx::GetInstance()->gl->mInitialised) {
+				//glViewport(0, 0, Psx::GetInstance()->mMainWnd->width, Psx::GetInstance()->mMainWnd->height);
 			//}
 			break;
 
@@ -252,29 +252,29 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-void CWindow::MenuCreate() {
+void Window::MenuCreate() {
 	hMenu = CreateMenu();
 }
 
-void CWindow::MenuSet() {
+void Window::MenuSet() {
 	SetMenu(hWnd, hMenu);
 }
 
-HMENU CWindow::PopupMenuCreate(char *name) {
+HMENU Window::PopupMenuCreate(char *name) {
 	HMENU hSubMenu = CreatePopupMenu(); 
 	AppendMenu(hMenu, MF_STRING | MF_POPUP, (UINT)hSubMenu, name);
 	return hSubMenu;
 }
 
-void CWindow::AddMenuItem(HMENU hSubMenu, int menuItemID, char *name) {
+void Window::AddMenuItem(HMENU hSubMenu, int menuItemID, char *name) {
 	AppendMenu(hSubMenu, MF_STRING, menuItemID, name);
 }
 
-void CWindow::AddMenuSeperator(HMENU hSubMenu) {
+void Window::AddMenuSeperator(HMENU hSubMenu) {
 	AppendMenu(hSubMenu, MF_SEPARATOR, 0, 0);
 }
 
-BOOL CWindow::IsResolutionSupported(int width, int height) {
+BOOL Window::IsResolutionSupported(int width, int height) {
 	DEVMODE mode;
 	for (int i = 0; EnumDisplaySettings(0, i, &mode); i++) {
 		if (ChangeDisplaySettings(&mode, CDS_TEST) == DISP_CHANGE_SUCCESSFUL)
@@ -285,7 +285,7 @@ BOOL CWindow::IsResolutionSupported(int width, int height) {
 	return FALSE;
 }
 
-BOOL CWindow::WindowCreate(const char *title, 
+BOOL Window::WindowCreate(const char *title, 
 								const char *className, 
 								int width, int height,
 								BOOL b_vScrollBar,
@@ -305,7 +305,7 @@ BOOL CWindow::WindowCreate(const char *title,
     wc.lpfnWndProc   = (WNDPROC)proc;
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
-    wc.hInstance     = CPsx::GetInstance()->hInst;
+    wc.hInstance     = Psx::GetInstance()->hInst;
     wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
     wc.hCursor       = LoadCursor(0, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)CreateSolidBrush(bgCol);	
@@ -329,7 +329,7 @@ BOOL CWindow::WindowCreate(const char *title,
 								width,height,	
 								hParent,							
 								0,								
-								CPsx::GetInstance()->hInst,							
+								Psx::GetInstance()->hInst,							
 								0)))	{
 		MessageBox(0,"Window Creation Error", "ERROR", MB_OK | MB_ICONEXCLAMATION);
 		return FALSE;							
@@ -349,7 +349,7 @@ BOOL CWindow::WindowCreate(const char *title,
 }
 
 /* processes messages from all windows created on the current thread */
-void CWindow::ProcessMessages() {
+void Window::ProcessMessages() {
 	static MSG msg;
 	while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);			
@@ -357,7 +357,7 @@ void CWindow::ProcessMessages() {
 	}
 }
 
-static BOOL CreateMainWindows(CPsx *psx) {
+static BOOL CreateMainWindows(Psx *psx) {
 #if defined (_DEBUG) 
 	char *title = "yaPSXe (debug build)";
 #elif defined (NDEBUG)
@@ -381,7 +381,7 @@ static BOOL CreateMainWindows(CPsx *psx) {
 	EnableMenuItem(psx->mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_BYCOMMAND | MF_GRAYED);
 	psx->mMainWnd->AddMenuSeperator(hSubMenu);
 	psx->mMainWnd->AddMenuItem(hSubMenu, IDM_EMULATION_EXIT, "&Exit");
-	hSubMenu = psx->mMainWnd->PopupMenuCreate("&Config");
+	hSubMenu = psx->mMainWnd->PopupMenuCreate("&PsxConfig");
 	psx->mMainWnd->AddMenuItem(hSubMenu, IDM_CONFIG_CONFIGURE, "&Configure");
 #if defined (_DEBUG)
 	hSubMenu = psx->mMainWnd->PopupMenuCreate("&Debug");	
@@ -398,7 +398,7 @@ static BOOL CreateMainWindows(CPsx *psx) {
 	return TRUE;
 }
 
-static void CreateThreads(CPsx *psx) {
+static void CreateThreads(Psx *psx) {
 #if defined (_DEBUG)
 	psx->mCpuDbg->mCpuDbgThread = CreateThread(0,0,(LPTHREAD_START_ROUTINE)
 		DebuggerThreadEntryFunc,0,0, &psx->mCpuDbg->mCpuDbgThreadId);
@@ -414,7 +414,7 @@ int WINAPI WinMain( HINSTANCE hInstance,
 					LPSTR lpCmdLine, 
 					int nCmdShow)
 {
-	CPsx *psx = CPsx::GetInstance();
+	Psx *psx = Psx::GetInstance();
 
 	CoInitialize(0);
 
@@ -430,7 +430,7 @@ int WINAPI WinMain( HINSTANCE hInstance,
 	while (!psx->quit) {
 		if (psx->cpu->state == PSX_CPU_RUNNING) {
 			if (timeGetTime()-start > 1000) {
-				float speed = ((float)psx->cpu->mTotalCycles / CPsx::CPU_CLOCK) * 100.0;
+				float speed = ((float)psx->cpu->mTotalCycles / Psx::CPU_CLOCK) * 100.0;
 				sprintf_s(title, 256, "%.2f fps (%.2f%%)", (speed / 100.0) * 60.0, speed);
 				SetWindowText(psx->mDispWnd->GetHwnd(), title);
 
@@ -441,7 +441,7 @@ int WINAPI WinMain( HINSTANCE hInstance,
 			SetWindowText(psx->mDispWnd->GetHwnd(), "Paused");
 		}
 
-		CWindow::ProcessMessages();
+		Window::ProcessMessages();
 		Sleep(10);
 	}
 

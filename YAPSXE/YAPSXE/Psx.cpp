@@ -34,7 +34,7 @@
 #include "CpuDebugger.h"
 #endif
 
-CPsx::CPsx() {
+Psx::Psx() {
 	hInst = GetModuleHandle(0);
 
 	quit = FALSE;
@@ -42,19 +42,19 @@ CPsx::CPsx() {
 	// init console first
 	csl = new Console;
 
-	mMainWnd = new CWindow;
-	mDispWnd = new CWindow;
-	mPCBreakpoints = new CBreakpoints;
-	gl = new CGLRenderer;
+	mMainWnd = new Window;
+	mDispWnd = new Window;
+	mPPsxBreakpoints = new PsxBreakpoints;
+	gl = new PsxGLRenderer;
 #if defined (_DEBUG)
-	mCpuDbg = new CpuDebugger;
+	mCpuDbg = new PsxCpuDebugger;
 #endif
 	gpu = new PsxGpu;
 	spu = new PsxSpu;
 	cpu = new PsxCpu;
 	mem = new PsxMemory;
 	interpreter = new PsxInterpreter;
-	rcnt = new RootCounters;
+	rcnt = new PsxCounters;
 
 	/* InitClassPointers must be called, but only when 
 	   all objects are allocated */
@@ -66,10 +66,10 @@ CPsx::CPsx() {
 	rcnt->InitClassPointers();
 
 	// must be called after InitClassPointers
-	conf = new Config;
+	conf = new PsxConfig;
 }
 
-CPsx::~CPsx() {
+Psx::~Psx() {
 	// stop the emulation thread first
 	SuspendThread(mEmuThread);
 
@@ -77,9 +77,9 @@ CPsx::~CPsx() {
 		delete conf; 
 		conf = 0;
 	}
-	if (mPCBreakpoints) {
-		delete mPCBreakpoints; 
-		mPCBreakpoints = 0;
+	if (mPPsxBreakpoints) {
+		delete mPPsxBreakpoints; 
+		mPPsxBreakpoints = 0;
 	}
 	if (cpu) {
 		delete cpu; 
@@ -129,7 +129,7 @@ CPsx::~CPsx() {
 	}
 }
 
-void CPsx::PauseEmulation(BOOL pause) {
+void Psx::PauseEmulation(BOOL pause) {
 	if (pause) {
 		CheckMenuItem(mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_CHECKED);
 		cpu->SetPsxCpu(PSX_CPU_HALTED);
@@ -139,16 +139,16 @@ void CPsx::PauseEmulation(BOOL pause) {
 	}
 }
 
-u32 CPsx::GetHwRevision() {
+u32 Psx::GetHwRevision() {
 	return (mCurBios ? mCurBios->hwRevision : -1);
 }
 
-void CPsx::SignalQuit() {
+void Psx::SignalQuit() {
 	quit = TRUE;
 	SendMessage(mMainWnd->GetHwnd(), WM_CLOSE, 0, 0);
 }
 
-void CPsx::StartEmulation() {
+void Psx::StartEmulation() {
 	/* enable and uncheck the pause menu item */
 	EnableMenuItem(mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_BYCOMMAND | MF_ENABLED);
 	CheckMenuItem(mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_UNCHECKED);
@@ -170,7 +170,7 @@ void CPsx::StartEmulation() {
 #endif
 }
 
-void CPsx::Execute() {
+void Psx::Execute() {
 	if (!conf->bBiosLoaded) {
 		MessageBox(mMainWnd->GetHwnd(), "BIOS not loaded", "Error", MB_ICONERROR);
 		return;
@@ -178,33 +178,33 @@ void CPsx::Execute() {
 	StartEmulation();
 }
 
-void CPsx::StartSaveStateEmulation(const char *filename) {
+void Psx::StartSaveStateEmulation(const char *filename) {
 	if (!RestoreSaveStateFile(filename)) {
 		return;
 	}
 	StartEmulation();
 }
 
-void CPsx::ResetPsx() {
+void Psx::ResetPsx() {
 	cpu->Reset();
 	gpu->InitGpu();
 	spu->InitSpu();
 	mem->ResetMem();
 }
 
-void CPsx::GetVramImage(u16 *image) {
+void Psx::GetVramImage(u16 *image) {
 	gpu->mVramImagePtr = image;
 	gpu->mSaveVram = TRUE;
 	while (gpu->mSaveVram) Sleep(50);
 }
 
-void CPsx::SetVramImage(u16 *image) {
+void Psx::SetVramImage(u16 *image) {
 	gpu->mVramImagePtr = image;
 	gpu->mRestoreVram = TRUE;
 	while (gpu->mRestoreVram) Sleep(50);
 }
 
-void CPsx::ClearVram() {
+void Psx::ClearVram() {
 	static u16 mem[1024*512];
 	memset(mem,0,1024*512*sizeof(u16));
 	SetVramImage(mem);
@@ -212,7 +212,7 @@ void CPsx::ClearVram() {
 
 static const char const *gSaveStateID = "PSX-SAVE-STATE-FILE";
 
-BOOL CPsx::CreateSaveStateFile(const char *filename) {
+BOOL Psx::CreateSaveStateFile(const char *filename) {
 	std::ofstream fSaveState(filename, std::ios::out | std::ios::binary);
 
 	if (!fSaveState.is_open()) {
@@ -241,7 +241,7 @@ BOOL CPsx::CreateSaveStateFile(const char *filename) {
 	fSaveState.write((char*)mem, sizeof(PsxMemory));
 	fSaveState.write((char*)gpu, sizeof(PsxGpu));
 	fSaveState.write((char*)spu, sizeof(PsxSpu));
-	fSaveState.write((char*)rcnt, sizeof(RootCounters));
+	fSaveState.write((char*)rcnt, sizeof(PsxCounters));
 
 	/* and the vram image */
 	u16 *vram = new u16 [PsxGpu::VRAM_WIDTH*PsxGpu::VRAM_HEIGHT*2];
@@ -256,7 +256,7 @@ BOOL CPsx::CreateSaveStateFile(const char *filename) {
 	return TRUE;
 }
 
-BOOL CPsx::RestoreSaveStateFile(const char *filename) {
+BOOL Psx::RestoreSaveStateFile(const char *filename) {
 	std::ifstream fSaveState;
 	char timebuf[18];
 
@@ -289,7 +289,7 @@ BOOL CPsx::RestoreSaveStateFile(const char *filename) {
 	fSaveState.read((char*)mem, sizeof(PsxMemory));
 	fSaveState.read((char*)gpu, sizeof(PsxGpu));
 	fSaveState.read((char*)spu, sizeof(PsxSpu));	
-	fSaveState.read((char*)rcnt, sizeof(RootCounters));	
+	fSaveState.read((char*)rcnt, sizeof(PsxCounters));	
 
 	/* re-init all the pointers we invalidated */
 	cpu->InitClassPointers();
@@ -312,7 +312,7 @@ BOOL CPsx::RestoreSaveStateFile(const char *filename) {
 }
 
 void EmulationThreadEntryFunc() {
-	CPsx *psx = CPsx::GetInstance();
+	Psx *psx = Psx::GetInstance();
 
 	/* has to be called in this thread */
 	if (!psx->gl->InitOpenGLWindow(psx->mDispWnd)) {

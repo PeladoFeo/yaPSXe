@@ -26,10 +26,10 @@
 
 #define BOFFSET (pc + ((s16)(code.imm) << 2) + 4)
 
-#define RS		CpuDebugger::GetGprRegName(code.rs)
-#define BASE	CpuDebugger::GetGprRegName(code.rs)
-#define RT		CpuDebugger::GetGprRegName(code.rt)
-#define RD		CpuDebugger::GetGprRegName(code.rd)
+#define RS		PsxCpuDebugger::GetGprRegName(code.rs)
+#define BASE	PsxCpuDebugger::GetGprRegName(code.rs)
+#define RT		PsxCpuDebugger::GetGprRegName(code.rt)
+#define RD		PsxCpuDebugger::GetGprRegName(code.rd)
 
 static void dasmPsxSPECIAL(char *str, PsxOpcode code, u32 pc);
 static void dasmPsxREGIMM(char *str, PsxOpcode code, u32 pc);
@@ -293,7 +293,7 @@ static void dasmPsxBGEZAL(char *str, PsxOpcode code, u32 pc) {
 }
 
 static void dasmPsxMFC0(char *str, PsxOpcode code, u32 pc) {
-	SPF("MFCO %s,%s", RT, CpuDebugger::GetCp0RegName(code.rd));
+	SPF("MFCO %s,%s", RT, PsxCpuDebugger::GetCp0RegName(code.rd));
 }
 
 static void dasmPsxCFC0(char *str, PsxOpcode code, u32 pc) {
@@ -301,11 +301,11 @@ static void dasmPsxCFC0(char *str, PsxOpcode code, u32 pc) {
 }
 
 static void dasmPsxMTC0(char *str, PsxOpcode code, u32 pc) {
-	SPF("MTCO %s,%s", RT, CpuDebugger::GetCp0RegName(code.rd));
+	SPF("MTCO %s,%s", RT, PsxCpuDebugger::GetCp0RegName(code.rd));
 }
 
 static void dasmPsxCTC0(char *str, PsxOpcode code, u32 pc) {
-	SPF("CTC0 %s,%s", RT, CpuDebugger::GetCp0RegName(code.rd));
+	SPF("CTC0 %s,%s", RT, PsxCpuDebugger::GetCp0RegName(code.rd));
 }
 
 static void dasmPsxRFE(char *str, PsxOpcode code, u32 pc) {
@@ -500,7 +500,7 @@ static void dasmPsxBASIC(char *str, PsxOpcode code, u32 pc) {
 	dasmPsxCP2BSC[code.rs](str, code, pc);
 }
 
-char *CpuDebugger::DasmOne(PsxOpcode code, u32 pc) {
+char *PsxCpuDebugger::DasmOne(PsxOpcode code, u32 pc) {
 	static char str[256];
 
 	memset(str,'\0',256);

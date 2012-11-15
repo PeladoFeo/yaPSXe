@@ -39,13 +39,13 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 typedef LRESULT (*WinProc)(HWND,UINT,WPARAM,LPARAM);
 
-class CWindow {
+class Window {
 public:
-	CWindow() {
+	Window() {
 		MenuCreate();
 	}
 
-	~CWindow() {
+	~Window() {
 		//UnregisterClass(lpcstrClassName, hInstance);
 	}
 

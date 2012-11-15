@@ -66,7 +66,7 @@ private:
 	PsxCpu *cpu;
 	PsxGpu *gpu;
 	PsxSpu *spu;
-	RootCounters *rcnt;
+	PsxCounters *rcnt;
 };
 
 #endif /* MEMORY_H */

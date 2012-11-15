@@ -32,13 +32,13 @@
 */
 
 
-const std::string Config::regions[] = {"NTSC:J", "NTSC:U/C", "PAL", "NTSC:J"};
+const std::string PsxConfig::regions[] = {"NTSC:J", "NTSC:U/C", "PAL", "NTSC:J"};
 
-Config::Config() {
-	psx = CPsx::GetInstance();
+PsxConfig::PsxConfig() {
+	psx = Psx::GetInstance();
 
 	if (!OpenRegistryKeys()) {
-		MessageBox(0, "Config: failed to open registry keys\n", "Error", MB_ICONERROR);
+		MessageBox(0, "PsxConfig: failed to open registry keys\n", "Error", MB_ICONERROR);
 	}
 
 	mBiosDirectoryPath = GetBiosDirKey();
@@ -61,14 +61,14 @@ Config::Config() {
 	}
 }
 
-Config::~Config() {
+PsxConfig::~PsxConfig() {
 }
 
 /* does basic checks to see if the file is a valid BIOS image.
    also (if info is not null) tries to identity the BIOS using a 
    checksum. if it's recognised, the pointer passed in "info" is 
    modified to point to the relevant "struct BiosInfo" entry */
-BOOL Config::IsValidBiosFile(std::string path, const BiosInfo **info) {
+BOOL PsxConfig::IsValidBiosFile(std::string path, const BiosInfo **info) {
 	std::ifstream bios;
 
 	bios.open(path, std::ios::in | std::ios::binary);
@@ -109,7 +109,7 @@ BOOL Config::IsValidBiosFile(std::string path, const BiosInfo **info) {
 		NOTE: To return BIOS files in "C:\BIOS", use a directory string of 
 			  'C:\BIOS\*'.
 */
-std::vector<ConfigBiosFiles> Config::GetValidBiosFileNamesInDir(std::string directory) {
+std::vector<ConfigBiosFiles> PsxConfig::GetValidBiosFileNamesInDir(std::string directory) {
 	ConfigBiosFiles tmp;
 	std::vector<ConfigBiosFiles> files;
 	WIN32_FIND_DATA fileData; 
@@ -119,13 +119,13 @@ std::vector<ConfigBiosFiles> Config::GetValidBiosFileNamesInDir(std::string dire
 		return (std::vector<ConfigBiosFiles>)0;
 	}
 
-	if (Config::IsValidBiosFile(std::string(fileData.cFileName), &tmp.info)) {
+	if (PsxConfig::IsValidBiosFile(std::string(fileData.cFileName), &tmp.info)) {
 		strcpy(tmp.fileName, fileData.cFileName);
 		files.push_back(tmp);
 	}
 
 	while(FindNextFile(hFind, &fileData)) {
-		if (Config::IsValidBiosFile(CPsx::GetInstance()->conf->mBiosDirectoryPath + '/' + fileData.cFileName, &tmp.info)) {
+		if (PsxConfig::IsValidBiosFile(Psx::GetInstance()->conf->mBiosDirectoryPath + '/' + fileData.cFileName, &tmp.info)) {
 			strcpy(tmp.fileName, fileData.cFileName);
 			files.push_back(tmp);
 		}
@@ -136,14 +136,14 @@ std::vector<ConfigBiosFiles> Config::GetValidBiosFileNamesInDir(std::string dire
 }
 
 /* populates the bios combo box with valid bios roms from the current bios directory */
-void Config::RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFiles, CPsx *psx) {
+void PsxConfig::RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFiles, Psx *psx) {
 	psx->PauseEmulation(TRUE);
 
 	std::string biosStr;
 	std::string strCurConfigBios = psx->conf->GetCurBiosRegKey();
 	int nCurConfigBiosIndex = 0;
 	HWND hwndBiosCombo = GetDlgItem(hDlg, IDC_CONF_BIOS_LIST_COMBO);
-	vBiosFiles = Config::GetValidBiosFileNamesInDir(psx->conf->mBiosDirectoryPath + "/*");
+	vBiosFiles = PsxConfig::GetValidBiosFileNamesInDir(psx->conf->mBiosDirectoryPath + "/*");
 
 	ComboBox_ResetContent(hwndBiosCombo);
 
@@ -163,7 +163,7 @@ void Config::RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFile
 		if (vBiosFiles[i].info) {
 			biosStr +=  "  (" + 
 				std::string(vBiosFiles[i].info->name) + " " +
-				Config::regions[vBiosFiles[i].info->region] + ')';
+				PsxConfig::regions[vBiosFiles[i].info->region] + ')';
 		} else {
 			biosStr += "  (Unknown)";
 		}
@@ -176,11 +176,11 @@ void Config::RefreshBiosCombo(HWND hDlg, std::vector<ConfigBiosFiles> &vBiosFile
 
 LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam) {
 	static std::vector<ConfigBiosFiles> vBiosFiles;
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
 
 	switch(msg) {
 		case WM_INITDIALOG: {
-			Config::RefreshBiosCombo(hDlg, vBiosFiles, psx);
+			PsxConfig::RefreshBiosCombo(hDlg, vBiosFiles, psx);
 
 			HWND hBiosDirEdit = GetDlgItem(hDlg, IDC_BIOS_DIR_EDIT);
 			SetWindowText(hBiosDirEdit, psx->conf->mBiosDirectoryPath.c_str());
@@ -227,10 +227,10 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 
 				case ID_BROWSE_BIOS_FOLDER: {
 					TCHAR szFolder[MAX_PATH];
-					if (CWindow::GetFolderSelection(0, szFolder, "Select BIOS Directory")) {
+					if (Window::GetFolderSelection(0, szFolder, "Select BIOS Directory")) {
 						psx->conf->mBiosDirectoryPath = szFolder;
 						psx->conf->SetBiosDirKey(szFolder);
-						Config::RefreshBiosCombo(hDlg, vBiosFiles, psx);
+						PsxConfig::RefreshBiosCombo(hDlg, vBiosFiles, psx);
 						HWND hBiosDirEdit = GetDlgItem(hDlg, IDC_BIOS_DIR_EDIT);
 						SetWindowText(hBiosDirEdit, psx->conf->mBiosDirectoryPath.c_str());
 					}
@@ -239,7 +239,7 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 				case IDC_RESET_CONF: {
 					psx->conf->mBiosDirectoryPath = "BIOS";
 					psx->conf->SetBiosDirKey((char*)psx->conf->mBiosDirectoryPath.c_str());
-					Config::RefreshBiosCombo(hDlg, vBiosFiles, psx);
+					PsxConfig::RefreshBiosCombo(hDlg, vBiosFiles, psx);
 					HWND hBiosDirEdit = GetDlgItem(hDlg, IDC_BIOS_DIR_EDIT);
 					SetWindowText(hBiosDirEdit, psx->conf->mBiosDirectoryPath.c_str());
 				} break;
@@ -256,7 +256,7 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 	return 0;
 }
 
-BOOL Config::OpenRegistryKeys() {
+BOOL PsxConfig::OpenRegistryKeys() {
 	/* 
 		open all the keys we want. if they don't exist, create them. 
 	*/
@@ -303,12 +303,12 @@ BOOL Config::OpenRegistryKeys() {
 	return TRUE;
 }
 
-void Config::SetCurBiosRegKey(char *fileName) {
+void PsxConfig::SetCurBiosRegKey(char *fileName) {
 	RegSetValueEx( hCurBiosFileKey, 0, 0, REG_SZ, 
 				  (const BYTE*)fileName, strlen(fileName));
 }
 
-std::string Config::GetCurBiosRegKey() {
+std::string PsxConfig::GetCurBiosRegKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
 	RegQueryValueEx( hCurBiosFileKey, 0, 0, 0, 
@@ -316,12 +316,12 @@ std::string Config::GetCurBiosRegKey() {
 	return std::string(str);
 }
 
-void Config::SetBiosDirKey(char *path) {
+void PsxConfig::SetBiosDirKey(char *path) {
 	RegSetValueEx( hBiosDirectory, 0, 0, REG_SZ, 
 				  (const BYTE*)path, strlen(path));
 }
 
-std::string Config::GetBiosDirKey() {
+std::string PsxConfig::GetBiosDirKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
 	RegQueryValueEx( hBiosDirectory, 0, 0, 0, 
@@ -329,14 +329,14 @@ std::string Config::GetBiosDirKey() {
 	return std::string(str);
 }
 
-void Config::SetLimitFpsKey(BOOL val) {
+void PsxConfig::SetLimitFpsKey(BOOL val) {
 	std::string str;
 	str = (val ? "true" : "false");
 	RegSetValueEx( hLimitFpsKey, 0, 0, REG_SZ, 
 		(const BYTE*)str.c_str(), str.length());
 }
 
-BOOL Config::GetLimitFpsKey() {
+BOOL PsxConfig::GetLimitFpsKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
 	RegQueryValueEx( hLimitFpsKey, 0, 0, 0, 

@@ -35,22 +35,24 @@
 #include <shlobj.h>
 #include <objbase.h>
 
+// uncomment to disable all console output
+// in this build
 //#define GLOBAL_DISABLE_CSL_OUT
 
-class CPsx;
+class Psx;
 class PsxMemory;
 class PsxCpu;
 class PsxGpu;
 class PsxSpu;
-class Console;
+class PsxGLRenderer;
 class PsxInterpreter;
-class CWindow;
-class CBreakpoints;
-class CpuDebugger;
-class CGLRenderer;
-class Config;
-class RootCounters;
+class PsxBreakpoints;
+class PsxCpuDebugger;
+class PsxConfig;
+class PsxCounters;
 struct BiosInfo;
+class Console;
+class Window;
 
 typedef unsigned char u8;
 typedef unsigned short u16;

@@ -36,7 +36,7 @@ PsxGpu::~PsxGpu(){
 }
 
 void PsxGpu::InitClassPointers() {
-	psx = CPsx::GetInstance();
+	psx = Psx::GetInstance();
 	csl = psx->csl;
 	gl = psx->gl;
 }

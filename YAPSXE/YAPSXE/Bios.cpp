@@ -361,7 +361,7 @@ u32 CheckSum(u8 *data, u32 size) {
 
 BOOL PsxMemory::LoadBiosRom(std::string path) {
 	std::ifstream biosrom;
-	static CPsx *psx = CPsx::GetInstance();
+	static Psx *psx = Psx::GetInstance();
 	
 	biosrom.open(path.c_str(), std::ios::in | std::ios::binary);
 	if (!biosrom.is_open()) {
@@ -373,7 +373,7 @@ BOOL PsxMemory::LoadBiosRom(std::string path) {
 	biosrom.seekg(0, std::ios::end);
 	u32 size = (u32)biosrom.tellg();
 	if (size != BIOS_SIZE) {
-		MessageBox(0, "BIOS is incorrect size. Quitting", "Error", MB_ICONERROR);
+		MessageBox(0, "BIOS is incorrect size", "Error", MB_ICONERROR);
 		biosrom.close();
 		return FALSE;
 	}
@@ -388,7 +388,7 @@ BOOL PsxMemory::LoadBiosRom(std::string path) {
 	for (u32 i = 0; gBiosData[i].checksum != terminator; i++) {
 		if (gBiosData[i].checksum == checksum) {
 			psx->mCurBios = &gBiosData[i];
-			csl->out(CWHITE, "BIOS %s detected (checksum: 0x%x)\n", 
+			csl->out(CWHITE, "BIOS %s detected (checksum=0x%x)\n", 
 				gBiosData[i].name, checksum);
 
 			// no ascii info in SCPH-1000
@@ -410,8 +410,8 @@ BOOL PsxMemory::LoadBiosRom(std::string path) {
 		}
 	}
 
-	csl->out("Unknown BIOS loaded\n");
-	CPsx::GetInstance()->mCurBios = 0;
+	csl->out("Unknown BIOS loaded (checksum=0x%x)\n", checksum);
+	psx->mCurBios = 0;
 	return TRUE;
 }
 
