@@ -42,7 +42,7 @@
 #define LOG_PSX_BIOS_OUTPUT
 
 
-CInterpreter::CInterpreter() {
+PsxInterpreter::PsxInterpreter() {
 #if defined (LOG_CPU_EXEC)
 	fout = fopen("../Logs/cpu-exec.txt", "wt+");
 	bCpuTraceLog = TRUE;
@@ -50,6 +50,15 @@ CInterpreter::CInterpreter() {
 	bLogBiosCalls = FALSE;
 	bDoStep = FALSE;
 	tFrameStart = tFrameEnd = 0;
+}
+
+PsxInterpreter::~PsxInterpreter() {
+#if defined (LOG_CPU_EXEC)
+	fclose(fout);
+#endif
+}
+
+void PsxInterpreter::InitClassPointers() {
 	psx = CPsx::GetInstance();
 	cpu = psx->cpu;
 	mem = psx->mem;
@@ -57,13 +66,7 @@ CInterpreter::CInterpreter() {
 	csl = psx->csl;
 }
 
-CInterpreter::~CInterpreter() {
-#if defined (LOG_CPU_EXEC)
-	fclose(fout);
-#endif
-}
-
-void CInterpreter::Execute() {
+void PsxInterpreter::Execute() {
 	CPsx *psx = CPsx::GetInstance();
 	for (;;) {
 #if defined(_DEBUG)
@@ -80,7 +83,7 @@ void CInterpreter::Execute() {
 			case PSX_CPU_RUNNING: {
 				if (psx->mPCBreakpoints->CheckBreakpoint(cpu->pc)) {
 					psx->csl->out(CRED, "Breakpoint detected @ 0x%08X\n", cpu->pc);
-					cpu->SetCpuState(PSX_CPU_STEPPING);
+					cpu->SetPsxCpu(PSX_CPU_STEPPING);
 					psx->mCpuDbg->OpenDebugger();
 				} else {
 					ExecuteInstruction();
@@ -94,8 +97,6 @@ void CInterpreter::Execute() {
 #else if defined(_RELEASE)
 		if (cpu->state == PSX_CPU_RUNNING) {
 			ExecuteInstruction();
-		} else {
-			//Sleep(10);
 		}
 #endif
 		/* keep ticking regardless of the cpu state */
@@ -105,7 +106,7 @@ void CInterpreter::Execute() {
 	}
 }
 
-void CInterpreter::LogBiosCall() {
+void PsxInterpreter::LogBiosCall() {
 	int operation = cpu->GPR[9] & 0xff;
 	int address = cpu->pc & 0x1fffff;
 
@@ -120,7 +121,7 @@ void CInterpreter::LogBiosCall() {
 	}
 }
 
-void CInterpreter::ExecuteInstruction() {
+void PsxInterpreter::ExecuteInstruction() {
 #if defined (LOG_PSX_BIOS_OUTPUT)
 	// catch calls to putchar
 	int addr = cpu->pc & 0x1fffff, op = cpu->GPR[9] & 0xff;

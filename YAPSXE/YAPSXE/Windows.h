@@ -57,7 +57,7 @@ public:
 						 WinProc proc,
 						 COLORREF bgCol, 
 						 BOOL child = FALSE, 
-						 HWND parent = NULL,
+						 HWND parent = 0,
 						 int addedStyles = 0);
 
 	void KillWindow();

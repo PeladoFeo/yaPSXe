@@ -22,30 +22,30 @@
 #include "Gpu.h"
 #include "Cpu.h"
 
-PFNGLISRENDERBUFFEREXTPROC						glIsRenderbufferEXT = NULL;
-PFNGLBINDRENDERBUFFEREXTPROC					glBindRenderbufferEXT = NULL;
-PFNGLDELETERENDERBUFFERSEXTPROC					glDeleteRenderbuffersEXT = NULL;
-PFNGLGENRENDERBUFFERSEXTPROC					glGenRenderbuffersEXT = NULL;
-PFNGLRENDERBUFFERSTORAGEEXTPROC					glRenderbufferStorageEXT = NULL;
-PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC			glGetRenderbufferParameterivEXT = NULL;
-PFNGLISFRAMEBUFFEREXTPROC						glIsFramebufferEXT = NULL;
-PFNGLBINDFRAMEBUFFEREXTPROC						glBindFramebufferEXT = NULL;
-PFNGLDELETEFRAMEBUFFERSEXTPROC					glDeleteFramebuffersEXT = NULL;
-PFNGLGENFRAMEBUFFERSEXTPROC						glGenFramebuffersEXT = NULL;
-PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC				glCheckFramebufferStatusEXT = NULL;
-PFNGLFRAMEBUFFERTEXTURE1DEXTPROC				glFramebufferTexture1DEXT = NULL;
-PFNGLFRAMEBUFFERTEXTURE2DEXTPROC				glFramebufferTexture2DEXT = NULL;
-PFNGLFRAMEBUFFERTEXTURE3DEXTPROC				glFramebufferTexture3DEXT = NULL;
-PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC				glFramebufferRenderbufferEXT = NULL;
-PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC glGetFramebufferAttachmentParameterivEXT = NULL;
-PFNGLGENERATEMIPMAPEXTPROC						glGenerateMipmapEXT = NULL;
-PFNGLDRAWBUFFERSPROC							glDrawBuffers = NULL;
+PFNGLISRENDERBUFFEREXTPROC						glIsRenderbufferEXT = 0;
+PFNGLBINDRENDERBUFFEREXTPROC					glBindRenderbufferEXT = 0;
+PFNGLDELETERENDERBUFFERSEXTPROC					glDeleteRenderbuffersEXT = 0;
+PFNGLGENRENDERBUFFERSEXTPROC					glGenRenderbuffersEXT = 0;
+PFNGLRENDERBUFFERSTORAGEEXTPROC					glRenderbufferStorageEXT = 0;
+PFNGLGETRENDERBUFFERPARAMETERIVEXTPROC			glGetRenderbufferParameterivEXT = 0;
+PFNGLISFRAMEBUFFEREXTPROC						glIsFramebufferEXT = 0;
+PFNGLBINDFRAMEBUFFEREXTPROC						glBindFramebufferEXT = 0;
+PFNGLDELETEFRAMEBUFFERSEXTPROC					glDeleteFramebuffersEXT = 0;
+PFNGLGENFRAMEBUFFERSEXTPROC						glGenFramebuffersEXT = 0;
+PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC				glCheckFramebufferStatusEXT = 0;
+PFNGLFRAMEBUFFERTEXTURE1DEXTPROC				glFramebufferTexture1DEXT = 0;
+PFNGLFRAMEBUFFERTEXTURE2DEXTPROC				glFramebufferTexture2DEXT = 0;
+PFNGLFRAMEBUFFERTEXTURE3DEXTPROC				glFramebufferTexture3DEXT = 0;
+PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC				glFramebufferRenderbufferEXT = 0;
+PFNGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXTPROC glGetFramebufferAttachmentParameterivEXT = 0;
+PFNGLGENERATEMIPMAPEXTPROC						glGenerateMipmapEXT = 0;
+PFNGLDRAWBUFFERSPROC							glDrawBuffers = 0;
 
 #define GL_LOADFN(name)  \
-	if( (*(void**)&name = (void*)wglGetProcAddress(#name)) == NULL ) { \
+	if( (*(void**)&name = (void*)wglGetProcAddress(#name)) == 0 ) { \
 		static char str[256]; \
 		sprintf(str, "Failed to load OpenGL extension '%s'", #name); \
-		MessageBox(NULL, str, "ERROR", MB_ICONERROR);\
+		MessageBox(0, str, "ERROR", MB_ICONERROR);\
 		CPsx::GetInstance()->SignalQuit();\
 	}
 
@@ -66,7 +66,7 @@ CGLRenderer::~CGLRenderer() {
 }
 
 void CGLRenderer::DestroyOpenGL() {
-	wglMakeCurrent(NULL,NULL);			
+	wglMakeCurrent(0,0);			
 	wglDeleteContext(hRC);		
 	if (glWindow) {
 		ReleaseDC(glWindow->GetHwnd(), glWindow->hDC);
@@ -157,14 +157,14 @@ BOOL CGLRenderer::InitOpenGLWindow(CWindow *wnd) {
 		bExtensionsLoaded = TRUE;
 	}
 
-	if (!CreateFrameBufferObject(CGpu::VRAM_WIDTH, CGpu::VRAM_HEIGHT)) {
+	if (!CreateFrameBufferObject(PsxGpu::VRAM_WIDTH, PsxGpu::VRAM_HEIGHT)) {
 		MessageBox(CPsx::GetInstance()->mMainWnd->GetHwnd(), 
 			"OpenGL FBO extensions unsupported", "Error", MB_ICONERROR);
 		return FALSE;
 	}
 
-	mFboRenderWidth = CGpu::VRAM_WIDTH;
-	mFboRenderHeight = CGpu::VRAM_HEIGHT;
+	mFboRenderWidth = PsxGpu::VRAM_WIDTH;
+	mFboRenderHeight = PsxGpu::VRAM_HEIGHT;
 
 	mInitialised = TRUE;
 	return TRUE;
@@ -188,7 +188,7 @@ BOOL CGLRenderer::CreateFrameBufferObject(int width, int height) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// reserve texture memory (texels are undefined)
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
 
 	glGenFramebuffersEXT(1, &mFboID);
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboID);
@@ -259,7 +259,7 @@ static void GetMaxDispRes(int &width, int &height) {
 	int maxw = 0, maxh = 0;
 	DEVMODE mode;
 
-	for (int i = 0; EnumDisplaySettings(NULL, i, &mode); i++) {
+	for (int i = 0; EnumDisplaySettings(0, i, &mode); i++) {
 		if (ChangeDisplaySettings(&mode, CDS_TEST) == DISP_CHANGE_SUCCESSFUL)
 			if (mode.dmPelsWidth > maxw) maxw = mode.dmPelsWidth;
 			if (mode.dmPelsHeight > maxh) maxh = mode.dmPelsHeight;
@@ -272,7 +272,7 @@ static void GetMaxDispRes(int &width, int &height) {
 void CGLRenderer::ToggleFullscreenMode() {
 	CPsx *psx = CPsx::GetInstance();
 
-	psx->cpu->SetCpuState(PSX_CPU_HALTED);
+	psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 
 	glWindow->ShowWnd(FALSE);
 
@@ -281,7 +281,7 @@ void CGLRenderer::ToggleFullscreenMode() {
 		SetWindowLong(glWindow->GetHwnd(), GWL_STYLE, WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 
 		GetMaxDispRes(glWindow->width, glWindow->height);
-		SetWindowPos(glWindow->GetHwnd(), 0, 0, 0, glWindow->width, glWindow->height, NULL);
+		SetWindowPos(glWindow->GetHwnd(), 0, 0, 0, glWindow->width, glWindow->height, 0);
 
 		glWindow->mFullscreen = TRUE;
 	} else {
@@ -290,7 +290,7 @@ void CGLRenderer::ToggleFullscreenMode() {
 
 		glWindow->width = 640;
 		glWindow->height = 480;
-		SetWindowPos(glWindow->GetHwnd(), 0, 0, 0, glWindow->width, glWindow->height, NULL);
+		SetWindowPos(glWindow->GetHwnd(), 0, 0, 0, glWindow->width, glWindow->height, 0);
 
 		glWindow->mFullscreen = FALSE;
 	}
@@ -299,5 +299,5 @@ void CGLRenderer::ToggleFullscreenMode() {
 	SetForegroundWindow(glWindow->GetHwnd());
 	SetFocus(glWindow->GetHwnd());
 
-	psx->cpu->SetCpuState(PSX_CPU_RUNNING);
+	psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
 }

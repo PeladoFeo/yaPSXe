@@ -21,7 +21,7 @@
 
 #include "Common.h"
 
-#define DEFAULT_REG_STR_KEY_VAL	"NULL"
+#define DEFAULT_REG_STR_KEY_VAL	"0"
 
 LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam);
 

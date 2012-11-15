@@ -348,7 +348,7 @@ const BiosCalls bioscalls[] = {
 	{ 0xc0, 0x1a, "sys_c0_1a()" },
 	{ 0xc0, 0x1b, "KernelRedirect(int flag)" },
 	{ 0xc0, 0x1c, "PatchA0Table()" },
-	{ 0x00, 0x00, NULL }
+	{ 0x00, 0x00, 0 }
 };
 
 u32 CheckSum(u8 *data, u32 size) {
@@ -359,13 +359,13 @@ u32 CheckSum(u8 *data, u32 size) {
 	return checksum;
 }
 
-BOOL CMemory::LoadBiosRom(std::string path) {
+BOOL PsxMemory::LoadBiosRom(std::string path) {
 	std::ifstream biosrom;
 	static CPsx *psx = CPsx::GetInstance();
 	
 	biosrom.open(path.c_str(), std::ios::in | std::ios::binary);
 	if (!biosrom.is_open()) {
-		MessageBox(NULL, "Failed to open BIOS ROM", "Error", MB_ICONERROR);
+		MessageBox(0, "Failed to open BIOS ROM", "Error", MB_ICONERROR);
 		biosrom.close();
 		return FALSE;
 	}
@@ -373,7 +373,7 @@ BOOL CMemory::LoadBiosRom(std::string path) {
 	biosrom.seekg(0, std::ios::end);
 	u32 size = (u32)biosrom.tellg();
 	if (size != BIOS_SIZE) {
-		MessageBox(NULL, "BIOS is incorrect size. Quitting", "Error", MB_ICONERROR);
+		MessageBox(0, "BIOS is incorrect size. Quitting", "Error", MB_ICONERROR);
 		biosrom.close();
 		return FALSE;
 	}
@@ -411,7 +411,7 @@ BOOL CMemory::LoadBiosRom(std::string path) {
 	}
 
 	csl->out("Unknown BIOS loaded\n");
-	CPsx::GetInstance()->mCurBios = NULL;
+	CPsx::GetInstance()->mCurBios = 0;
 	return TRUE;
 }
 

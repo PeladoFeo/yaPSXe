@@ -48,7 +48,7 @@ static char *HexToSignedStr16(s16 hex) {
 	return (char*)str;
 }
 
-static void dasmPsxNULL(char *str, PsxOpcode code, u32 pc) {
+static void dasmPsx0(char *str, PsxOpcode code, u32 pc) {
 	SPF("???");
 }
 
@@ -428,55 +428,55 @@ static void dasmGteNCCT(char *str, PsxOpcode code, u32 pc) {
 void (*DasmPsxBSC[64])(char *str, PsxOpcode code, u32 pc) = {
 	dasmPsxSPECIAL, dasmPsxREGIMM, dasmPsxJ   , dasmPsxJAL  , dasmPsxBEQ , dasmPsxBNE , dasmPsxBLEZ, dasmPsxBGTZ,
 	dasmPsxADDI   , dasmPsxADDIU , dasmPsxSLTI, dasmPsxSLTIU, dasmPsxANDI, dasmPsxORI , dasmPsxXORI, dasmPsxLUI ,
-	dasmPsxCOP0   , dasmPsxNULL  , dasmPsxCOP2, dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL   , dasmPsxNULL  , dasmPsxNULL, dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxLB     , dasmPsxLH    , dasmPsxLWL , dasmPsxLW   , dasmPsxLBU , dasmPsxLHU , dasmPsxLWR , dasmPsxNULL,
-	dasmPsxSB     , dasmPsxSH    , dasmPsxSWL , dasmPsxSW   , dasmPsxNULL, dasmPsxNULL, dasmPsxSWR , dasmPsxNULL, 
-	dasmPsxNULL   , dasmPsxNULL  , dasmGteLWC2, dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL   , dasmPsxNULL  , dasmGteSWC2, dasmPsxHLE  , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL 
+	dasmPsxCOP0   , dasmPsx0  , dasmPsxCOP2, dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0   , dasmPsx0  , dasmPsx0, dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsxLB     , dasmPsxLH    , dasmPsxLWL , dasmPsxLW   , dasmPsxLBU , dasmPsxLHU , dasmPsxLWR , dasmPsx0,
+	dasmPsxSB     , dasmPsxSH    , dasmPsxSWL , dasmPsxSW   , dasmPsx0, dasmPsx0, dasmPsxSWR , dasmPsx0, 
+	dasmPsx0   , dasmPsx0  , dasmGteLWC2, dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0   , dasmPsx0  , dasmGteSWC2, dasmPsxHLE  , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0 
 };
 
 void (*dasmPsxSPC[64])(char *str, PsxOpcode code, u32 pc) = {
-	dasmPsxSLL , dasmPsxNULL , dasmPsxSRL , dasmPsxSRA , dasmPsxSLLV   , dasmPsxNULL , dasmPsxSRLV, dasmPsxSRAV,
-	dasmPsxJR  , dasmPsxJALR , dasmPsxNULL, dasmPsxNULL, dasmPsxSYSCALL, dasmPsxBREAK, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxMFHI, dasmPsxMTHI , dasmPsxMFLO, dasmPsxMTLO, dasmPsxNULL   , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL,
-	dasmPsxMULT, dasmPsxMULTU, dasmPsxDIV , dasmPsxDIVU, dasmPsxNULL   , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL,
+	dasmPsxSLL , dasmPsx0 , dasmPsxSRL , dasmPsxSRA , dasmPsxSLLV   , dasmPsx0 , dasmPsxSRLV, dasmPsxSRAV,
+	dasmPsxJR  , dasmPsxJALR , dasmPsx0, dasmPsx0, dasmPsxSYSCALL, dasmPsxBREAK, dasmPsx0, dasmPsx0,
+	dasmPsxMFHI, dasmPsxMTHI , dasmPsxMFLO, dasmPsxMTLO, dasmPsx0   , dasmPsx0 , dasmPsx0, dasmPsx0,
+	dasmPsxMULT, dasmPsxMULTU, dasmPsxDIV , dasmPsxDIVU, dasmPsx0   , dasmPsx0 , dasmPsx0, dasmPsx0,
 	dasmPsxADD , dasmPsxADDU , dasmPsxSUB , dasmPsxSUBU, dasmPsxAND    , dasmPsxOR   , dasmPsxXOR , dasmPsxNOR ,
-	dasmPsxNULL, dasmPsxNULL , dasmPsxSLT , dasmPsxSLTU, dasmPsxNULL   , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL   , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL   , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL
+	dasmPsx0, dasmPsx0 , dasmPsxSLT , dasmPsxSLTU, dasmPsx0   , dasmPsx0 , dasmPsx0, dasmPsx0,
+	dasmPsx0, dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0   , dasmPsx0 , dasmPsx0, dasmPsx0,
+	dasmPsx0, dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0   , dasmPsx0 , dasmPsx0, dasmPsx0
 };
 
 void (*dasmPsxREG[32])(char *str, PsxOpcode code, u32 pc) = {
-	dasmPsxBLTZ  , dasmPsxBGEZ  , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL  , dasmPsxNULL  , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxBLTZAL, dasmPsxBGEZAL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL  , dasmPsxNULL  , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL
+	dasmPsxBLTZ  , dasmPsxBGEZ  , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0  , dasmPsx0  , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsxBLTZAL, dasmPsxBGEZAL, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0  , dasmPsx0  , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0
 };
 
 void (*dasmPsxCP0[32])(char *str, PsxOpcode code, u32 pc) = {
-	dasmPsxMFC0, dasmPsxNULL, dasmPsxCFC0, dasmPsxNULL, dasmPsxMTC0, dasmPsxNULL, dasmPsxCTC0, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxRFE , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL
+	dasmPsxMFC0, dasmPsx0, dasmPsxCFC0, dasmPsx0, dasmPsxMTC0, dasmPsx0, dasmPsxCTC0, dasmPsx0,
+	dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsxRFE , dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0
 };
 
 void (*dasmPsxCP2[64])(char *str, PsxOpcode code, u32 pc) = {
-	dasmPsxBASIC, dasmGteRTPS , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL , dasmGteNCLIP, dasmPsxNULL,
-	dasmPsxNULL , dasmPsxNULL , dasmPsxNULL , dasmPsxNULL, dasmGteOP  , dasmPsxNULL , dasmPsxNULL , dasmPsxNULL,
-	dasmGteDPCS , dasmGteINTPL, dasmGteMVMVA, dasmGteNCDS, dasmGteCDP , dasmPsxNULL , dasmGteNCDT , dasmPsxNULL,
-	dasmPsxNULL , dasmPsxNULL , dasmPsxNULL , dasmGteNCCS, dasmGteCC  , dasmPsxNULL , dasmGteNCS  , dasmPsxNULL,
-	dasmGteNCT  , dasmPsxNULL , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL , dasmPsxNULL , dasmPsxNULL,
-	dasmGteSQR  , dasmGteDCPL , dasmGteDPCT , dasmPsxNULL, dasmPsxNULL, dasmGteAVSZ3, dasmGteAVSZ4, dasmPsxNULL, 
-	dasmGteRTPT , dasmPsxNULL , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmPsxNULL , dasmPsxNULL , dasmPsxNULL,
-	dasmPsxNULL , dasmPsxNULL , dasmPsxNULL , dasmPsxNULL, dasmPsxNULL, dasmGteGPF  , dasmGteGPL  , dasmGteNCCT
+	dasmPsxBASIC, dasmGteRTPS , dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0 , dasmGteNCLIP, dasmPsx0,
+	dasmPsx0 , dasmPsx0 , dasmPsx0 , dasmPsx0, dasmGteOP  , dasmPsx0 , dasmPsx0 , dasmPsx0,
+	dasmGteDPCS , dasmGteINTPL, dasmGteMVMVA, dasmGteNCDS, dasmGteCDP , dasmPsx0 , dasmGteNCDT , dasmPsx0,
+	dasmPsx0 , dasmPsx0 , dasmPsx0 , dasmGteNCCS, dasmGteCC  , dasmPsx0 , dasmGteNCS  , dasmPsx0,
+	dasmGteNCT  , dasmPsx0 , dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0 , dasmPsx0 , dasmPsx0,
+	dasmGteSQR  , dasmGteDCPL , dasmGteDPCT , dasmPsx0, dasmPsx0, dasmGteAVSZ3, dasmGteAVSZ4, dasmPsx0, 
+	dasmGteRTPT , dasmPsx0 , dasmPsx0 , dasmPsx0, dasmPsx0, dasmPsx0 , dasmPsx0 , dasmPsx0,
+	dasmPsx0 , dasmPsx0 , dasmPsx0 , dasmPsx0, dasmPsx0, dasmGteGPF  , dasmGteGPL  , dasmGteNCCT
 };
 
 void (*dasmPsxCP2BSC[32])(char *str, PsxOpcode code, u32 pc) = {
-	dasmGteMFC2, dasmPsxNULL, dasmGteCFC2, dasmPsxNULL, dasmGteMTC2, dasmPsxNULL, dasmGteCTC2, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL,
-	dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL, dasmPsxNULL
+	dasmGteMFC2, dasmPsx0, dasmGteCFC2, dasmPsx0, dasmGteMTC2, dasmPsx0, dasmGteCTC2, dasmPsx0,
+	dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0,
+	dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0, dasmPsx0
 };
 
 

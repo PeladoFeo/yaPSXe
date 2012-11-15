@@ -46,15 +46,18 @@ public:
 	void SetVramImage(u16 *image);
 	void ClearVram();
 
-	CMemory *mem;
-	CpuState *cpu;
-	CGpu *gpu;
-	CSpu *spu;
+	PsxMemory *mem;
+	PsxCpu *cpu;
+	PsxGpu *gpu;
+	PsxSpu *spu;
 	Console *csl;
-	CInterpreter *interpreter;
+	PsxInterpreter *interpreter;
 	CGLRenderer *gl;
+	RootCounters *rcnt;
+
 	CWindow *mMainWnd;
 	CWindow *mDispWnd;
+	
 	const BiosInfo *mCurBios;
 	CBreakpoints *mPCBreakpoints;
 	Config *conf;

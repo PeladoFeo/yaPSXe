@@ -22,12 +22,12 @@
 #include "Common.h"
 #include "Psx.h"
 
-class CSpu {
+class PsxSpu {
 public:
-	CSpu();
+	PsxSpu();
 	void InitSpu();
 
-	void SetClassPointers();
+	void InitClassPointers();
 
 	void WriteReg16(u32 addr, u16 val);
 	u16 ReadReg16(u32 addr);

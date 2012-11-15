@@ -27,7 +27,7 @@
 #include "Config.h"
 
 
-void CpuState::Exception(u32 code) {
+void PsxCpu::Exception(u32 code) {
 	Cause.exc_code = code;
 
 	if (delay_type == PSX_DELAY_SLOT) {
@@ -51,7 +51,7 @@ void CpuState::Exception(u32 code) {
 					  ((CP0[CP0_STATUS] & 0xf) << 2);
 }
 
-void CInterpreter::CheckInterrupts() {
+void PsxInterpreter::CheckInterrupts() {
 	if (cpu->cycles >= VBL_START) {
 		mem->mIREG |= VBL_INTR;
 	}

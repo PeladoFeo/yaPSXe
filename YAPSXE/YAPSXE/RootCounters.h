@@ -15,32 +15,33 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+#pragma once
+#ifndef ROOT_COUNTERS_H
+#define ROOT_COUNTERS_H
+
 #include "Common.h"
-#include "Cpu.h"
 #include "Psx.h"
-#include "Console.h"
-#include "Gpu.h"
-#include "Spu.h"
 
+class RootCounters {
+public:
+	RootCounters();
+	void InitClassPointers();
 
-PsxCpu::PsxCpu() {
-	state = PSX_CPU_STEPPING;
-	Reset();
-}
+	u32 ReadCurrent(int n);
+	u32 ReadMode(int n);
+	u32 ReadTarget(int n);
 
-void PsxCpu::InitClassPointers() {
-	csl = CPsx::GetInstance()->csl;
-	gpu = CPsx::GetInstance()->gpu;
-	spu = CPsx::GetInstance()->spu;
-}
+	void WriteCurrent(int n, u32 data);
+	void WriteMode(int n, u32 data);
+	void WriteTarget(int n, u32 data);
 
-void PsxCpu::Reset() {
-	memset(this, 0, sizeof(PsxCpu));
+private:
+	u32 count[4];
+	u32 mode[4];
+	u32 target[4];
 
-	delay_type = PSX_NO_DELAY;
+	CPsx *psx;
+	Console *csl;
+};
 
-	CP0[CP0_STATUS] = 0x10900000;	// COP0 enabled | BEV = 1 | TS = 1
-	CP0[CP0_PRID] = 0x00000002;		// PRevID = Revision ID, same as Cpu
-
-	pc = 0xbfc00000;
-}
+#endif /* ROOT_COUNTERS_H */

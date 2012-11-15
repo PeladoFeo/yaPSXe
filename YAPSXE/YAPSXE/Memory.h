@@ -21,9 +21,9 @@
 
 #include "Common.h"
 
-class CMemory {
+class PsxMemory {
 public:
-	CMemory();
+	PsxMemory();
 	void ResetMem();
 
 	void Write8(u32 addr, u8 data);
@@ -47,7 +47,7 @@ public:
 
 	BOOL LoadBiosRom(std::string path);
 
-	void SetClassPointers();
+	void InitClassPointers();
 
 	u32 mIREG;
 	u32 mIMASK;
@@ -63,9 +63,10 @@ public:
 
 private:
 	Console *csl;
-	CpuState *cpu;
-	CGpu *gpu;
-	CSpu *spu;
+	PsxCpu *cpu;
+	PsxGpu *gpu;
+	PsxSpu *spu;
+	RootCounters *rcnt;
 };
 
 #endif /* MEMORY_H */

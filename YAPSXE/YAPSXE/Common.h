@@ -38,17 +38,18 @@
 //#define GLOBAL_DISABLE_CSL_OUT
 
 class CPsx;
-class CMemory;
-class CpuState;
-class CGpu;
-class CSpu;
+class PsxMemory;
+class PsxCpu;
+class PsxGpu;
+class PsxSpu;
 class Console;
-class CInterpreter;
+class PsxInterpreter;
 class CWindow;
 class CBreakpoints;
 class CpuDebugger;
 class CGLRenderer;
 class Config;
+class RootCounters;
 struct BiosInfo;
 
 typedef unsigned char u8;

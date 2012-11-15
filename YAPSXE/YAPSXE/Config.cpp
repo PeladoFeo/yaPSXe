@@ -38,7 +38,7 @@ Config::Config() {
 	psx = CPsx::GetInstance();
 
 	if (!OpenRegistryKeys()) {
-		MessageBox(NULL, "Config: failed to open registry keys\n", "Error", MB_ICONERROR);
+		MessageBox(0, "Config: failed to open registry keys\n", "Error", MB_ICONERROR);
 	}
 
 	mBiosDirectoryPath = GetBiosDirKey();
@@ -48,7 +48,7 @@ Config::Config() {
 	/* try to load the bios if it's configured */
 	if (strCurBios != DEFAULT_REG_STR_KEY_VAL) {
 		std::string strBiosPath = mBiosDirectoryPath + '/' + strCurBios;
-		if (IsValidBiosFile(strBiosPath, NULL)) {
+		if (IsValidBiosFile(strBiosPath, 0)) {
 			/* load the BIOS */
 			if (psx->mem->LoadBiosRom(strBiosPath)) {
 				bBiosLoaded = TRUE;
@@ -89,7 +89,7 @@ BOOL Config::IsValidBiosFile(std::string path, const BiosInfo **info) {
 		bios.seekg(0, std::ios::beg);
 		bios.read((char*)buf, size);
 
-		*info = NULL;
+		*info = 0;
 
 		u32 checksum = CheckSum(buf, BIOS_SIZE);
 		for (u32 i = 0; gBiosData[i].checksum != terminator; i++) {
@@ -116,7 +116,7 @@ std::vector<ConfigBiosFiles> Config::GetValidBiosFileNamesInDir(std::string dire
 	HANDLE hFind = INVALID_HANDLE_VALUE; 
 
 	if ((hFind = FindFirstFile(directory.c_str(), &fileData)) == INVALID_HANDLE_VALUE) {
-		return (std::vector<ConfigBiosFiles>)NULL;
+		return (std::vector<ConfigBiosFiles>)0;
 	}
 
 	if (Config::IsValidBiosFile(std::string(fileData.cFileName), &tmp.info)) {
@@ -227,7 +227,7 @@ LRESULT CALLBACK ConfigDlgProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 
 				case ID_BROWSE_BIOS_FOLDER: {
 					TCHAR szFolder[MAX_PATH];
-					if (CWindow::GetFolderSelection(NULL, szFolder, "Select BIOS Directory")) {
+					if (CWindow::GetFolderSelection(0, szFolder, "Select BIOS Directory")) {
 						psx->conf->mBiosDirectoryPath = szFolder;
 						psx->conf->SetBiosDirKey(szFolder);
 						Config::RefreshBiosCombo(hDlg, vBiosFiles, psx);
@@ -264,7 +264,7 @@ BOOL Config::OpenRegistryKeys() {
 	if (RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\YAPSXE", 0, 
 					  KEY_ALL_ACCESS, &hParentKey) != ERROR_SUCCESS) {
 		if (RegCreateKeyEx( HKEY_CURRENT_USER, "Software\\YAPSXE", 0, 0, 
-							REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, 
+							REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, 0, 
 							&hParentKey, 0) != ERROR_SUCCESS) {
 			return FALSE;
 		}
@@ -274,7 +274,7 @@ BOOL Config::OpenRegistryKeys() {
 	if (RegOpenKeyEx( hParentKey, "CurBiosFileName", 0, 
 					  KEY_ALL_ACCESS, &hCurBiosFileKey) != ERROR_SUCCESS) {
 		if (RegCreateKeyEx( hParentKey, "CurBiosFileName", 0, 0, REG_OPTION_NON_VOLATILE, 
-						    KEY_ALL_ACCESS, NULL, &hCurBiosFileKey, 0) != ERROR_SUCCESS) {
+						    KEY_ALL_ACCESS, 0, &hCurBiosFileKey, 0) != ERROR_SUCCESS) {
 			return FALSE;
 		}
 		SetCurBiosRegKey(DEFAULT_REG_STR_KEY_VAL);
@@ -284,7 +284,7 @@ BOOL Config::OpenRegistryKeys() {
 	if (RegOpenKeyEx( hParentKey, "BiosDirectory", 0, 
 					  KEY_ALL_ACCESS, &hBiosDirectory) != ERROR_SUCCESS) {
 		if (RegCreateKeyEx( hParentKey, "BiosDirectory", 0, 0, REG_OPTION_NON_VOLATILE, 
-						    KEY_ALL_ACCESS, NULL, &hBiosDirectory, 0) != ERROR_SUCCESS) {
+						    KEY_ALL_ACCESS, 0, &hBiosDirectory, 0) != ERROR_SUCCESS) {
 			return FALSE;
 		}
 		SetBiosDirKey("BIOS"); // default BIOS directory path
@@ -294,7 +294,7 @@ BOOL Config::OpenRegistryKeys() {
 	if (RegOpenKeyEx( hParentKey, "LimitFPS", 0, 
 					  KEY_ALL_ACCESS, &hLimitFpsKey) != ERROR_SUCCESS) {
 		if (RegCreateKeyEx( hParentKey, "LimitFps", 0, 0, REG_OPTION_NON_VOLATILE, 
-						    KEY_ALL_ACCESS, NULL, &hLimitFpsKey, 0) != ERROR_SUCCESS) {
+						    KEY_ALL_ACCESS, 0, &hLimitFpsKey, 0) != ERROR_SUCCESS) {
 			return FALSE;
 		}
 		SetLimitFpsKey(TRUE);
@@ -304,27 +304,27 @@ BOOL Config::OpenRegistryKeys() {
 }
 
 void Config::SetCurBiosRegKey(char *fileName) {
-	RegSetValueEx( hCurBiosFileKey, NULL, 0, REG_SZ, 
+	RegSetValueEx( hCurBiosFileKey, 0, 0, REG_SZ, 
 				  (const BYTE*)fileName, strlen(fileName));
 }
 
 std::string Config::GetCurBiosRegKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
-	RegQueryValueEx( hCurBiosFileKey, NULL, 0, NULL, 
+	RegQueryValueEx( hCurBiosFileKey, 0, 0, 0, 
 				  (LPBYTE)str, (LPDWORD)&size);
 	return std::string(str);
 }
 
 void Config::SetBiosDirKey(char *path) {
-	RegSetValueEx( hBiosDirectory, NULL, 0, REG_SZ, 
+	RegSetValueEx( hBiosDirectory, 0, 0, REG_SZ, 
 				  (const BYTE*)path, strlen(path));
 }
 
 std::string Config::GetBiosDirKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
-	RegQueryValueEx( hBiosDirectory, NULL, 0, NULL, 
+	RegQueryValueEx( hBiosDirectory, 0, 0, 0, 
 				  (LPBYTE)str, (LPDWORD)&size);
 	return std::string(str);
 }
@@ -332,14 +332,14 @@ std::string Config::GetBiosDirKey() {
 void Config::SetLimitFpsKey(BOOL val) {
 	std::string str;
 	str = (val ? "true" : "false");
-	RegSetValueEx( hLimitFpsKey, NULL, 0, REG_SZ, 
+	RegSetValueEx( hLimitFpsKey, 0, 0, REG_SZ, 
 		(const BYTE*)str.c_str(), str.length());
 }
 
 BOOL Config::GetLimitFpsKey() {
 	char str[MAX_PATH];
 	DWORD size = MAX_PATH;
-	RegQueryValueEx( hLimitFpsKey, NULL, 0, NULL, 
+	RegQueryValueEx( hLimitFpsKey, 0, 0, 0, 
 				  (LPBYTE)str, (LPDWORD)&size);
 	return (std::string(str) == "true" ? true : false);
 }

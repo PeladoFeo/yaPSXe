@@ -44,9 +44,9 @@ BOOL CWindow::OpenFileDlg(HWND hwnd, char *out, char *filter) {
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrFilter = filter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrFileTitle = 0;
 	ofn.nMaxFileTitle = 0;
-	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrInitialDir = 0;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	if (GetOpenFileName(&ofn)) {
@@ -59,21 +59,20 @@ BOOL CWindow::OpenFileDlg(HWND hwnd, char *out, char *filter) {
 
 /*
  * Displays a directory selection dialog. CoInitialize must be called before calling this function.
- * szBuf must be MAX_PATH characters in length. hWnd may be NULL.
+ * szBuf must be MAX_PATH characters in length. hWnd may be 0.
  */
 BOOL CWindow::GetFolderSelection(HWND hWnd, LPTSTR szBuf, LPCTSTR szTitle) {
-	LPITEMIDLIST pidl     = NULL;
+	LPITEMIDLIST pidl     = 0;
 	BROWSEINFO   bi       = { 0 };
 	BOOL         bResult  = FALSE;
 
 	bi.hwndOwner      = hWnd;
 	bi.pszDisplayName = szBuf;
-	bi.pidlRoot       = NULL;
+	bi.pidlRoot       = 0;
 	bi.lpszTitle      = szTitle;
 	bi.ulFlags        = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 
-	if ((pidl = SHBrowseForFolder(&bi)) != NULL)
-	{
+	if ((pidl = SHBrowseForFolder(&bi)) != 0) {
 		bResult = SHGetPathFromIDList(pidl, szBuf);
 		CoTaskMemFree(pidl);
 	}
@@ -93,9 +92,9 @@ BOOL CWindow::SaveFileDlg(HWND hWnd, char *out, char *filter) {
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrFilter = filter;
 	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = NULL;
+	ofn.lpstrFileTitle = 0;
 	ofn.nMaxFileTitle = 0;
-	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrInitialDir = 0;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	if (GetSaveFileName(&ofn)) {
@@ -173,7 +172,7 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				case IDM_EMULATION_LOAD_SAVESTATE: {
 					char path[MAX_PATH];
-					psx->cpu->SetCpuState(PSX_CPU_HALTED);
+					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 					if (CWindow::OpenFileDlg(hwnd, path, 
 						"Savestates (*.svt)\0*.svt\0All files (*.*)\0*.*\0\0")
 						) {
@@ -183,13 +182,13 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				case IDM_EMULATION_CREATE_SAVESTATE: {
 					char path[MAX_PATH];
-					psx->cpu->SetCpuState(PSX_CPU_HALTED);
+					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 					if (CWindow::SaveFileDlg(hwnd, path,
 						"All files (*.*)\0*.*\0\0")
 						) {
 						psx->CreateSaveStateFile(path);
 					}
-					psx->cpu->SetCpuState(PSX_CPU_RUNNING);
+					psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
 				} break;
 
 				case IDM_EMULATION_RESET:
@@ -204,11 +203,11 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					if (state & MF_GRAYED)
 						break;
 					if (state & MF_CHECKED) {
-						psx->cpu->SetCpuState(PSX_CPU_RUNNING);
+						psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
 						CheckMenuItem(psx->mMainWnd->GetHMenu(), 
 							IDM_EMULATION_PAUSE, MF_UNCHECKED);
 					} else {
-						psx->cpu->SetCpuState(PSX_CPU_HALTED);
+						psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 						CheckMenuItem(psx->mMainWnd->GetHMenu(), 
 							IDM_EMULATION_PAUSE, MF_CHECKED);
 					}
@@ -272,12 +271,12 @@ void CWindow::AddMenuItem(HMENU hSubMenu, int menuItemID, char *name) {
 }
 
 void CWindow::AddMenuSeperator(HMENU hSubMenu) {
-	AppendMenu(hSubMenu, MF_SEPARATOR, NULL, NULL);
+	AppendMenu(hSubMenu, MF_SEPARATOR, 0, 0);
 }
 
 BOOL CWindow::IsResolutionSupported(int width, int height) {
 	DEVMODE mode;
-	for (int i = 0; EnumDisplaySettings(NULL, i, &mode); i++) {
+	for (int i = 0; EnumDisplaySettings(0, i, &mode); i++) {
 		if (ChangeDisplaySettings(&mode, CDS_TEST) == DISP_CHANGE_SUCCESSFUL)
 			if (width == mode.dmPelsWidth && height == mode.dmPelsHeight) {
 				return TRUE;
@@ -307,15 +306,15 @@ BOOL CWindow::WindowCreate(const char *title,
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = CPsx::GetInstance()->hInst;
-    wc.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
-    wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wc.hIcon         = LoadIcon(0, IDI_APPLICATION);
+    wc.hCursor       = LoadCursor(0, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)CreateSolidBrush(bgCol);	
-    wc.lpszMenuName  = NULL;
+    wc.lpszMenuName  = 0;
     wc.lpszClassName = className;
-    wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hIconSm       = LoadIcon(0, IDI_APPLICATION);
 
     if(!RegisterClassEx(&wc)) {
-        MessageBox(NULL, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(0, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
         return FALSE;
     }
 
@@ -324,15 +323,15 @@ BOOL CWindow::WindowCreate(const char *title,
 								title,
 								WS_OVERLAPPEDWINDOW | 
 								WS_CLIPSIBLINGS | WS_CLIPCHILDREN  | 
-								(child ? WS_CHILD : NULL) 
-								| (b_vScrollBar ? WS_VSCROLL : NULL) | addedStyles,					
+								(child ? WS_CHILD : 0) 
+								| (b_vScrollBar ? WS_VSCROLL : 0) | addedStyles,					
 								CW_USEDEFAULT, CW_USEDEFAULT,								
 								width,height,	
 								hParent,							
-								NULL,								
+								0,								
 								CPsx::GetInstance()->hInst,							
-								NULL)))	{
-		MessageBox(NULL,"Window Creation Error", "ERROR", MB_OK | MB_ICONEXCLAMATION);
+								0)))	{
+		MessageBox(0,"Window Creation Error", "ERROR", MB_OK | MB_ICONEXCLAMATION);
 		return FALSE;							
 	}
 
@@ -352,7 +351,7 @@ BOOL CWindow::WindowCreate(const char *title,
 /* processes messages from all windows created on the current thread */
 void CWindow::ProcessMessages() {
 	static MSG msg;
-	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);			
 		DispatchMessage(&msg);			
 	}
@@ -401,13 +400,13 @@ static BOOL CreateMainWindows(CPsx *psx) {
 
 static void CreateThreads(CPsx *psx) {
 #if defined (_DEBUG)
-	psx->mCpuDbg->mCpuDbgThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)
-		DebuggerThreadEntryFunc,NULL,0, &psx->mCpuDbg->mCpuDbgThreadId);
+	psx->mCpuDbg->mCpuDbgThread = CreateThread(0,0,(LPTHREAD_START_ROUTINE)
+		DebuggerThreadEntryFunc,0,0, &psx->mCpuDbg->mCpuDbgThreadId);
 #endif 
 
 	/* everything happens in this thread, apart from window management and debugging */
-	psx->mEmuThread = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)EmulationThreadEntryFunc,
-		NULL, 0, &psx->mEmuThreadId);
+	psx->mEmuThread = CreateThread(0,0,(LPTHREAD_START_ROUTINE)EmulationThreadEntryFunc,
+		0, 0, &psx->mEmuThreadId);
 }
 
 int WINAPI WinMain( HINSTANCE hInstance, 
@@ -417,7 +416,7 @@ int WINAPI WinMain( HINSTANCE hInstance,
 {
 	CPsx *psx = CPsx::GetInstance();
 
-	CoInitialize(NULL);
+	CoInitialize(0);
 
 	if (!CreateMainWindows(psx)) {
 		return 1;
@@ -434,9 +433,12 @@ int WINAPI WinMain( HINSTANCE hInstance,
 				float speed = ((float)psx->cpu->mTotalCycles / CPsx::CPU_CLOCK) * 100.0;
 				sprintf_s(title, 256, "%.2f fps (%.2f%%)", (speed / 100.0) * 60.0, speed);
 				SetWindowText(psx->mDispWnd->GetHwnd(), title);
+
 				start = timeGetTime();
 				psx->cpu->mTotalCycles = 0;
 			}
+		} else {
+			SetWindowText(psx->mDispWnd->GetHwnd(), "Paused");
 		}
 
 		CWindow::ProcessMessages();

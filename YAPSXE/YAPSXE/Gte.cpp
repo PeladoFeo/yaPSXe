@@ -19,114 +19,114 @@
 #include "Interpreter.h"
 
 
-void CInterpreter::gteLWC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteLWC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteSWC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteSWC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteMFC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteMFC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteCFC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteCFC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteMTC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteMTC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteCTC2() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteCTC2() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteRTPS() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteRTPS() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCLIP() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCLIP() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteOP() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteOP() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteDPCS() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteDPCS() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteINTPL() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteINTPL() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteMVMVA() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteMVMVA() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCDS() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCDS() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteCDP() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteCDP() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCDT() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCDT() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCCS() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCCS() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteCC() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteCC() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCS() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCS() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCT() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCT() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteSQR() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteSQR() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteDCPL() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteDCPL() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteDPCT() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteDPCT() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteAVSZ3() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteAVSZ3() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteAVSZ4() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteAVSZ4() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteRTPT() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteRTPT() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteGPF() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteGPF() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteGPL() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteGPL() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::gteNCCT() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::gteNCCT() {
+	PsxInterpreter::unimplemented();
 }

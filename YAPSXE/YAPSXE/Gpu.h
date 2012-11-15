@@ -82,13 +82,13 @@ struct TexPageInfo {
 	u16 ti;
 };
 
-class CGpu {
+class PsxGpu {
 public:
-	CGpu();
-	~CGpu();
+	PsxGpu();
+	~PsxGpu();
 
 	void CheckVramTransferRequest();
-	void SetClassPointers();
+	void InitClassPointers();
 	void InitGpu();
 	void ResetState();
 	u32 ReadStatus();

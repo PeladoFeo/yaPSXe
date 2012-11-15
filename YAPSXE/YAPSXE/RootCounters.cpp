@@ -15,3 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
+#include "RootCounters.h"
+#include "Psx.h"
+#include "Console.h"
+
+/* 
+	todo
+*/
+
+RootCounters::RootCounters() {
+}
+
+void RootCounters::InitClassPointers() {
+	psx = CPsx::GetInstance();
+	csl = psx->csl;
+}
+
+u32 RootCounters::ReadCurrent(int n) {
+	return 0;
+}
+
+u32 RootCounters::ReadMode(int n) {
+	return 0;
+}
+
+u32 RootCounters::ReadTarget(int n) {
+	return 0;
+}
+
+void RootCounters::WriteCurrent(int n, u32 data) {
+	count[n] = data;
+}
+
+void RootCounters::WriteMode(int n, u32 data) {
+}
+
+void RootCounters::WriteTarget(int n, u32 data) {
+}

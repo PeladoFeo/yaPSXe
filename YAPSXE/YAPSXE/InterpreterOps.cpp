@@ -33,10 +33,10 @@
 #define IMM		cpu->PsxOp.imm
 
 /* necessary for static interpreter functions */
-CpuState *CInterpreter::cpu;
-CMemory *CInterpreter::mem;
+PsxCpu *PsxInterpreter::cpu;
+PsxMemory *PsxInterpreter::mem;
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxInstruction[64] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxInstruction[64] = {
 	psxSPECIAL, psxREGIMM, psxJ   , psxJAL  , psxBEQ , psxBNE , psxBLEZ, psxBGTZ,
 	psxADDI   , psxADDIU , psxSLTI, psxSLTIU, psxANDI, psxORI , psxXORI, psxLUI ,
 	psxCOP0   , psxNULL  , psxCOP2, psxNULL , psxNULL, psxNULL, psxNULL, psxNULL,
@@ -47,7 +47,7 @@ CInterpreter::PsxCpuInstruction CInterpreter::psxInstruction[64] = {
 	psxNULL   , psxNULL  , gteSWC2, psxHLE  , psxNULL, psxNULL, psxNULL, psxNULL 
 };
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxSPC[64] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxSPC[64] = {
 	psxSLL , psxNULL , psxSRL , psxSRA , psxSLLV   , psxNULL , psxSRLV, psxSRAV,
 	psxJR  , psxJALR , psxNULL, psxNULL, psxSYSCALL, psxBREAK, psxNULL, psxNULL,
 	psxMFHI, psxMTHI , psxMFLO, psxMTLO, psxNULL   , psxNULL , psxNULL, psxNULL,
@@ -58,21 +58,21 @@ CInterpreter::PsxCpuInstruction CInterpreter::psxSPC[64] = {
 	psxNULL, psxNULL , psxNULL, psxNULL, psxNULL   , psxNULL , psxNULL, psxNULL
 };
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxREG[32] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxREG[32] = {
 	psxBLTZ  , psxBGEZ  , psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxNULL  , psxNULL  , psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxBLTZAL, psxBGEZAL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxNULL  , psxNULL  , psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL
 };
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxCP0[32] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxCP0[32] = {
 	psxMFC0, psxNULL, psxCFC0, psxNULL, psxMTC0, psxNULL, psxCTC0, psxNULL,
 	psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxRFE , psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL
 };
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxCP2[64] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxCP2[64] = {
 	psxBASIC, gteRTPS , psxNULL , psxNULL, psxNULL, psxNULL , gteNCLIP, psxNULL,
 	psxNULL , psxNULL , psxNULL , psxNULL, gteOP  , psxNULL , psxNULL , psxNULL,
 	gteDPCS , gteINTPL, gteMVMVA, gteNCDS, gteCDP , psxNULL , gteNCDT , psxNULL,
@@ -83,7 +83,7 @@ CInterpreter::PsxCpuInstruction CInterpreter::psxCP2[64] = {
 	psxNULL , psxNULL , psxNULL , psxNULL, psxNULL, gteGPF  , gteGPL  , gteNCCT
 };
 
-CInterpreter::PsxCpuInstruction CInterpreter::psxCP2BSC[32] = {
+PsxInterpreter::PsxCpuInstruction PsxInterpreter::psxCP2BSC[32] = {
 	gteMFC2, psxNULL, gteCFC2, psxNULL, gteMTC2, psxNULL, gteCTC2, psxNULL,
 	psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
 	psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL, psxNULL,
@@ -91,54 +91,54 @@ CInterpreter::PsxCpuInstruction CInterpreter::psxCP2BSC[32] = {
 };
 
 
-void CInterpreter::unimplemented() {
+void PsxInterpreter::unimplemented() {
 #if defined (_DEBUG)
 	char *pstr = CpuDebugger::DasmOne(cpu->PsxOp,cpu->pc);
 	int i = 0; 
 	while (pstr[i] != ' ' && i < strlen(pstr)) i++; 
 	pstr[i] = '\0';
 	CPsx::GetInstance()->csl->out(CRED, "Unimplemented instruction '%s'\n", pstr);
-	cpu->SetCpuState(PSX_CPU_STEPPING);
+	cpu->SetPsxCpu(PSX_CPU_STEPPING);
 	CPsx::GetInstance()->mCpuDbg->OpenDebugger();
 #endif
 }
 
-void CInterpreter::psxNULL() {
+void PsxInterpreter::psxNULL() {
 	CPsx::GetInstance()->csl->out(CRED, "Unknown instruction @ 0x%08x\n", cpu->pc);
 }
 
-void CInterpreter::psxSPECIAL() {
+void PsxInterpreter::psxSPECIAL() {
 	psxSPC[cpu->PsxOp.funct]();
 }
 
-void CInterpreter::psxREGIMM() {
+void PsxInterpreter::psxREGIMM() {
 	psxREG[cpu->PsxOp.rt]();
 }
 
-void CInterpreter::psxCOP0() {
+void PsxInterpreter::psxCOP0() {
 	psxCP0[cpu->PsxOp.rs]();
 }
 
-void CInterpreter::psxCOP2() {
+void PsxInterpreter::psxCOP2() {
 	psxCP2[cpu->PsxOp.funct]();
 }
 
-void CInterpreter::psxBASIC() {
+void PsxInterpreter::psxBASIC() {
 	psxCP2BSC[cpu->PsxOp.rs]();
 }
 
-void CInterpreter::psxJ() {
+void PsxInterpreter::psxJ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	cpu->delay_pc  = (cpu->pc & 0xf0000000) + (cpu->PsxOp.target << 2);
 }
 
-void CInterpreter::psxJAL() {
+void PsxInterpreter::psxJAL() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	cpu->delay_pc  = (cpu->pc & 0xf0000000) + (cpu->PsxOp.target << 2);
 	cpu->GPR[31] = cpu->pc + 8;
 }
 
-void CInterpreter::psxBEQ() {
+void PsxInterpreter::psxBEQ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if (RS == RT) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -147,7 +147,7 @@ void CInterpreter::psxBEQ() {
 	}
 }
 
-void CInterpreter::psxBNE() {
+void PsxInterpreter::psxBNE() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if (RS != RT) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -156,7 +156,7 @@ void CInterpreter::psxBNE() {
 	}
 }
 
-void CInterpreter::psxBLEZ() {
+void PsxInterpreter::psxBLEZ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if ((s32)RS <= 0) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -165,7 +165,7 @@ void CInterpreter::psxBLEZ() {
 	}
 }
 
-void CInterpreter::psxBGTZ() {
+void PsxInterpreter::psxBGTZ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if ((s32)RS > 0) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -175,60 +175,60 @@ void CInterpreter::psxBGTZ() {
 }
 
 // exception on overflow
-void CInterpreter::psxADDI() {
+void PsxInterpreter::psxADDI() {
 	RT = (s32)((s32)RS + (s32)(s16)IMM);
 }
 
-void CInterpreter::psxADDIU() {
+void PsxInterpreter::psxADDIU() {
 	RT = (s32)((s32)RS + (s32)(s16)IMM);
 }
 
-void CInterpreter::psxSLTI() {
+void PsxInterpreter::psxSLTI() {
 	RT = ((s32)RS < (s32)(s16)IMM);
 }
 
-void CInterpreter::psxSLTIU() {
+void PsxInterpreter::psxSLTIU() {
 	RT = (RS < (u32)IMM);
 }
 
-void CInterpreter::psxANDI() {
+void PsxInterpreter::psxANDI() {
 	RT = (RS & (u32)IMM);
 }
 
-void CInterpreter::psxORI() {
+void PsxInterpreter::psxORI() {
 	RT = (RS | (u32)IMM);
 }
 
-void CInterpreter::psxXORI() {
+void PsxInterpreter::psxXORI() {
 	RT = (RS ^ (u32)IMM);
 }
 
-void CInterpreter::psxLUI() {
+void PsxInterpreter::psxLUI() {
 	RT = (u32)IMM << 16;
 }
 
-void CInterpreter::psxLB() {
+void PsxInterpreter::psxLB() {
 	RT = (s32)(s8)mem->Read8(RS + (s16)IMM);
 }
 
-void CInterpreter::psxLH() {
+void PsxInterpreter::psxLH() {
 	RT = (s32)(s16)mem->Read16(RS + (s16)IMM);
 }
 
 // address error exception
-void CInterpreter::psxLW() {
+void PsxInterpreter::psxLW() {
 	RT = mem->Read32(RS + (s16)IMM);
 }
 
-void CInterpreter::psxLBU() {
+void PsxInterpreter::psxLBU() {
 	RT = (u32)mem->Read8(RS + (s16)IMM);
 }
 
-void CInterpreter::psxLHU() {
+void PsxInterpreter::psxLHU() {
 	RT = (u32)mem->Read16(RS + (s16)IMM);
 }
 
-void CInterpreter::psxLWL() {
+void PsxInterpreter::psxLWL() {
 	u32 address = RS + (s16)IMM;
 	u32 val = mem->Read32(address & ~0x3);
 
@@ -244,7 +244,7 @@ void CInterpreter::psxLWL() {
 	RT = reg;
 }
 
-void CInterpreter::psxLWR() {
+void PsxInterpreter::psxLWR() {
 	u32 address = RS + (s16)IMM;
 	u32 val = mem->Read32(address & ~0x3);
 
@@ -260,19 +260,19 @@ void CInterpreter::psxLWR() {
 	RT = reg;
 }
 
-void CInterpreter::psxSB() {
+void PsxInterpreter::psxSB() {
 	mem->Write8(RS + (s16)IMM, (u8)RT);
 }
 
-void CInterpreter::psxSH() {
+void PsxInterpreter::psxSH() {
 	mem->Write16(RS + (s16)IMM, (u16)RT);
 }
 
-void CInterpreter::psxSW() {
+void PsxInterpreter::psxSW() {
 	mem->Write32(RS + (s16)IMM, RT);
 }
 
-void CInterpreter::psxSWL() {
+void PsxInterpreter::psxSWL() {
 	u32 newval;
 	u32 address = RS + (s16)IMM;
 	u32 treg = RT;
@@ -288,7 +288,7 @@ void CInterpreter::psxSWL() {
 	mem->Write32(address & ~0x3, newval);
 }
 
-void CInterpreter::psxSWR() {
+void PsxInterpreter::psxSWR() {
 	u32 newval;
 	u32 address = RS + (s16)IMM;
 	u32 treg = RT;
@@ -304,91 +304,91 @@ void CInterpreter::psxSWR() {
 	mem->Write32(address & ~0x3, newval);
 }
 
-void CInterpreter::psxHLE() {
-	CInterpreter::unimplemented();
+void PsxInterpreter::psxHLE() {
+	PsxInterpreter::unimplemented();
 }
 
-void CInterpreter::psxSLL() {
+void PsxInterpreter::psxSLL() {
 	RD = (s32)(RT << cpu->PsxOp.shamt);
 }
 
-void CInterpreter::psxSRL() {
+void PsxInterpreter::psxSRL() {
 	RD = (s32)(RT >> cpu->PsxOp.shamt);
 }
 
-void CInterpreter::psxSRA() {
+void PsxInterpreter::psxSRA() {
 	RD = (s32)((s32)RT >> cpu->PsxOp.shamt);
 }
 
-void CInterpreter::psxSLLV() {
+void PsxInterpreter::psxSLLV() {
 	RD = (s32)((RT << (RS & 0x1f)) & 0xffffffff);
 }
 
-void CInterpreter::psxSRLV() {
+void PsxInterpreter::psxSRLV() {
 	RD = (s32)(RT >> (RS & 0x1f));
 }
 
-void CInterpreter::psxSRAV() {
+void PsxInterpreter::psxSRAV() {
 	RD = (s32)((s32)RT >> (RS & 0x1f));
 }
 
-void CInterpreter::psxJR() {
+void PsxInterpreter::psxJR() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	cpu->delay_pc = RS;
 	//if (cpu->delay_pc & 0x3) { /* Address Error exception! */ }
 }
 
-void CInterpreter::psxJALR() {
+void PsxInterpreter::psxJALR() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	RD = cpu->pc + 8;
 	cpu->delay_pc = RS;
 	//if (cpu->delay_pc & 0x3) { /* Address Error exception! */ }
 }
 
-void CInterpreter::psxSYSCALL() {
+void PsxInterpreter::psxSYSCALL() {
 	cpu->Exception(EXC_SYS);
 }
 
-void CInterpreter::psxBREAK() {
-	MessageBox(NULL, "psxBREAK\n", "NULL", NULL);
+void PsxInterpreter::psxBREAK() {
+	MessageBox(0, "psxBREAK\n", "0", 0);
 }
 
-void CInterpreter::psxMFHI() {
+void PsxInterpreter::psxMFHI() {
 	RD = cpu->hi;
 }
 
-void CInterpreter::psxMTHI() {
+void PsxInterpreter::psxMTHI() {
 	cpu->hi = RS;
 }
 
-void CInterpreter::psxMFLO() {
+void PsxInterpreter::psxMFLO() {
 	RD = cpu->lo;
 }
 
-void CInterpreter::psxMTLO() {
+void PsxInterpreter::psxMTLO() {
 	cpu->lo = RS;
 }
 
-void CInterpreter::psxMULT() {
+void PsxInterpreter::psxMULT() {
 	u64 res = (s64)((s64)(s32)RS * (s64)(s32)RT);
 	cpu->lo = (u32)(res & 0xffffffff);
 	cpu->hi = (u32)((res >> 32) & 0xffffffff);
 }
 
-void CInterpreter::psxMULTU() {
+void PsxInterpreter::psxMULTU() {
 	u64 res = (u64)((u64)RS * (u64)RT);
 	cpu->lo = (u32)(res & 0xffffffff);
 	cpu->hi = (u32)((res >> 32) & 0xffffffff);
 }
 
-void CInterpreter::psxDIV() {
+void PsxInterpreter::psxDIV() {
 	if ((s32)RT != 0) {
 		cpu->lo = (s32)((s32)RS / (s32)RT);
 		cpu->hi = (s32)((s32)RS % (s32)RT);
 	}
 }
 
-void CInterpreter::psxDIVU() {
+void PsxInterpreter::psxDIVU() {
 	if (RT != 0) {
 		cpu->lo = RS / RT;
 		cpu->hi = RS % RT;
@@ -396,48 +396,48 @@ void CInterpreter::psxDIVU() {
 }
 
 // Overflow exception
-void CInterpreter::psxADD() {
+void PsxInterpreter::psxADD() {
 	RD = RS + RT;
 }
 
-void CInterpreter::psxADDU() {
+void PsxInterpreter::psxADDU() {
 	RD = RS + RT;
 }
 
 // Overflow exception
-void CInterpreter::psxSUB() {
+void PsxInterpreter::psxSUB() {
 	RD = RS - RT;
 }
 
-void CInterpreter::psxSUBU() {
+void PsxInterpreter::psxSUBU() {
 	RD = RS - RT;
 }
 
-void CInterpreter::psxAND() {
+void PsxInterpreter::psxAND() {
 	RD = RS & RT;
 }
 
-void CInterpreter::psxOR() {
+void PsxInterpreter::psxOR() {
 	RD = RS | RT;
 }
 
-void CInterpreter::psxXOR() {
+void PsxInterpreter::psxXOR() {
 	RD = RS ^ RT;
 }
 
-void CInterpreter::psxNOR() {
+void PsxInterpreter::psxNOR() {
 	RD = ~(RS | RT);
 }
 
-void CInterpreter::psxSLT() {
+void PsxInterpreter::psxSLT() {
 	RD = (s32)RS < (s32)RT;
 }
 
-void CInterpreter::psxSLTU() {
+void PsxInterpreter::psxSLTU() {
 	RD = RS < RT;
 }
 
-void CInterpreter::psxBLTZ() {
+void PsxInterpreter::psxBLTZ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if ((s32)RS < 0) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -446,7 +446,7 @@ void CInterpreter::psxBLTZ() {
 	}
 }
 
-void CInterpreter::psxBGEZ() {
+void PsxInterpreter::psxBGEZ() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	if ((s32)RS >= 0) {
 		cpu->delay_pc = cpu->pc + ((s16)(IMM) << 2) + 4;
@@ -455,7 +455,7 @@ void CInterpreter::psxBGEZ() {
 	}
 }
 
-void CInterpreter::psxBLTZAL() {
+void PsxInterpreter::psxBLTZAL() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	cpu->GPR[31] = cpu->pc + 8;
 	if ((s32)RS < 0) {
@@ -465,7 +465,7 @@ void CInterpreter::psxBLTZAL() {
 	}
 }
 
-void CInterpreter::psxBGEZAL() {
+void PsxInterpreter::psxBGEZAL() {
 	cpu->delay_type = PSX_DELAY_SLOT;
 	cpu->GPR[31] = cpu->pc + 8;
 	if ((s32)RS >= 0) {
@@ -475,15 +475,15 @@ void CInterpreter::psxBGEZAL() {
 	}
 }
 
-void CInterpreter::psxMFC0() {
+void PsxInterpreter::psxMFC0() {
 	RT = cpu->CP0[cpu->PsxOp.rd];
 }
 
-void CInterpreter::psxCFC0() {
+void PsxInterpreter::psxCFC0() {
 	RT = cpu->CP0[cpu->PsxOp.rd];
 }
 
-void CInterpreter::MTC0(u32 reg, u32 val) {
+void PsxInterpreter::MTC0(u32 reg, u32 val) {
 	switch (reg) {
 		case 12: // Status
 			cpu->CP0[CP0_STATUS] = val;
@@ -501,16 +501,16 @@ void CInterpreter::MTC0(u32 reg, u32 val) {
 	}
 }
 
-void CInterpreter::psxMTC0() {
+void PsxInterpreter::psxMTC0() {
 	MTC0(cpu->PsxOp.rd, RT);
 }
 
 // does this exist in the psx?
-void CInterpreter::psxCTC0() {
+void PsxInterpreter::psxCTC0() {
 	MTC0(cpu->PsxOp.rd, RT);
 }
 
-void CInterpreter::psxRFE() {
+void PsxInterpreter::psxRFE() {
 	cpu->CP0[CP0_STATUS] = (cpu->CP0[CP0_STATUS] & 0xfffffff0) |
 						  ((cpu->CP0[CP0_STATUS] & 0x3c) >> 2);
 }

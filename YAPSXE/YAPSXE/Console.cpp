@@ -34,7 +34,7 @@ Console::Console() {
 	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
 	fp = _fdopen(hConHandle, "w");
 	*stdout = *fp;
-	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stdout, 0, _IONBF, 0);
 
 	// make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog
 	// point to console as well
@@ -44,14 +44,6 @@ Console::Console() {
 	SetWindowText(hConsole, "Console");
 
 	mStdCol = CWHITE;
-
-	/*
-#if defined(_DEBUG) 
-	out(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED, "Debug build\n");
-#elif define(_RELEASE)
-	out(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED, " Release build\n");
-#endif
-	*/
 }
 
 void Console::out(int col, const char *fmt, ...) {

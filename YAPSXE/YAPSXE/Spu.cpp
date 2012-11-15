@@ -24,21 +24,20 @@
 //#define LOG_SPU_REGS
 
 
-CSpu::CSpu() {
-	SetClassPointers();
+PsxSpu::PsxSpu() {
 }
 
-void CSpu::SetClassPointers() {
+void PsxSpu::InitClassPointers() {
 	csl = CPsx::GetInstance()->csl;
 }
 
-void CSpu::InitSpu() {
+void PsxSpu::InitSpu() {
 	memset(mSpuMem, 0, 0x80000);
 	mSpuTransferAddr = 0;
 	mSpuStatus = 0;
 }
 
-void CSpu::WriteReg16(u32 addr, u16 val) {
+void PsxSpu::WriteReg16(u32 addr, u16 val) {
 	/* voices */
 	if (addr >= 0x1f801c00 && addr < 0x1f801d80) {
 		int voiceNum = ((addr >> 4) & 0xff) - 0xc0;
@@ -246,6 +245,6 @@ void CSpu::WriteReg16(u32 addr, u16 val) {
 	}
 }
 
-u16 CSpu::ReadReg16(u32 addr) {
+u16 PsxSpu::ReadReg16(u32 addr) {
 	return 0;
 }

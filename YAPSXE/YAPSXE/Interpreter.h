@@ -21,10 +21,12 @@
 
 #include "Common.h"
 
-class CInterpreter {
+class PsxInterpreter {
 public:
-	CInterpreter();
-	~CInterpreter();
+	PsxInterpreter();
+	~PsxInterpreter();
+
+	void InitClassPointers();
 
 	void Execute();
 	void ExecuteInstruction();
@@ -156,9 +158,9 @@ public:
 	static PsxCpuInstruction psxCP2BSC[32];
 
 	CPsx *psx;
-	static CpuState *cpu;
-	static CMemory *mem;
-	CGpu *gpu;
+	static PsxCpu *cpu;
+	static PsxMemory *mem;
+	PsxGpu *gpu;
 	Console *csl;
 };
 

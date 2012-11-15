@@ -28,21 +28,20 @@
 #define LOG_GPU_COMMANDS
 #endif
 
-CGpu::CGpu(){
-	SetClassPointers();
+PsxGpu::PsxGpu(){
 }
 
-CGpu::~CGpu(){
+PsxGpu::~PsxGpu(){
 	glDeleteTextures(1, &mCacheTexID);
 }
 
-void CGpu::SetClassPointers() {
+void PsxGpu::InitClassPointers() {
 	psx = CPsx::GetInstance();
 	csl = psx->csl;
 	gl = psx->gl;
 }
 
-void CGpu::ResetState() {
+void PsxGpu::ResetState() {
 	mStatusReg = 0x14802000;
 	mGpuBufferOffset = 0;
 	mVramPosX = 0;
@@ -63,10 +62,10 @@ void CGpu::ResetState() {
 	mDrawAreaY2 = 0;
 }
 
-void CGpu::InitGpu() {
+void PsxGpu::InitGpu() {
 	if (!gl->mInitialised) {
 		MessageBox(psx->mMainWnd->GetHwnd(), 
-			"Error: OpenGL must be initialised before calling 'CGpu::InitGpu()'", "Error", MB_ICONERROR);
+			"Error: OpenGL must be initialised before calling 'PsxGpu::InitGpu()'", "Error", MB_ICONERROR);
 		psx->SignalQuit();
 		return;
 	}
@@ -87,19 +86,22 @@ void CGpu::InitGpu() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB5_A1, 1024, 512, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB5_A1, 1024, 512, 0, GL_BGRA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 0);
 		bTexturesCreated = TRUE;
 	}
 }
 
-u32 CGpu::ReadStatus() {
+u32 PsxGpu::ReadStatus() {
 	/* hack for interlaced scan */
-	mStatusReg ^= 0x80000000;
+	static int i = 0;
+	if (i++ % 4) {
+		mStatusReg ^= 0x80000000;
+	}
 
 	return mStatusReg;
 }
 
-void CGpu::WriteStatus(u32 data) {
+void PsxGpu::WriteStatus(u32 data) {
 	u32 command = (data >> 24) & 0xff;
 	switch (command) {
 		// reset gpu
@@ -179,17 +181,20 @@ void CGpu::WriteStatus(u32 data) {
 			break;
 
 		// display mode
-		case 0x08:
+		case 0x08: {
 #if defined (LOG_GPU_STATUS_WRITES)
 			csl->out("GPU command: display mode 0x%08x\n", data);
 #endif
+			//short dispWidths[8] = {256,320,512,640,368,384,512,640};
+			//psx->csl->out("%d\n", dispWidths[(data & 0x03) | ((data & 0x40) >> 4)]);
+
 			mStatusReg &= ~( 127 << 0x10 );
 			mStatusReg |= (data & 0x3f) << 0x11; /* width 0 + height + videmode + isrgb24 + isinter */
 			mStatusReg |= ((data & 0x40) >> 0x06) << 0x10; /* width 1 */
 			//if(mGpuVersion == 1) {
 			//	mReverseFlag = (data >> 7) & 1;
 			//}
-			break;
+				   }break;
 
 		// gpu info
 		case 0x10:
@@ -258,7 +263,7 @@ void CGpu::WriteStatus(u32 data) {
 	}
 }
 
-u32 CGpu::ReadData() {
+u32 PsxGpu::ReadData() {
 	u32 ret;
 	if((mStatusReg & (1 << 0x1b))) {
 		static int curPixel = 0;
@@ -284,7 +289,7 @@ u32 CGpu::ReadData() {
 	return ret;
 }
 
-void CGpu::WriteData(u32 *pData, u32 size) {
+void PsxGpu::WriteData(u32 *pData, u32 size) {
 	for (int i = 0; i < size; i++, pData++) {
 		mCommandBuffer[mGpuBufferOffset] = *pData;
 		switch (mCommandBuffer[0] >> 24) {
@@ -497,7 +502,7 @@ void CGpu::WriteData(u32 *pData, u32 size) {
 					csl->out(CRED, "** Unimplemented GPU command 0x58: gouraud polyline\n");
 				}
 #endif
-				psx->cpu->SetCpuState(PSX_CPU_HALTED);
+				psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
 			} break;
 
 			case 0x60:
@@ -732,7 +737,7 @@ void CGpu::WriteData(u32 *pData, u32 size) {
 	}
 }
 
-void CGpu::WriteFramebufferImage() {
+void PsxGpu::WriteFramebufferImage() {
 	glDisable(GL_TEXTURE_2D);
 
 	u16 width = mCommandBuffer[2] & 0xffff;
@@ -744,7 +749,7 @@ void CGpu::WriteFramebufferImage() {
 	glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, mImageBuffer);
 }
 
-void CGpu::FillFramebufferRect() {
+void PsxGpu::FillFramebufferRect() {
 	glDisable(GL_TEXTURE_2D);
 
 	u32 bgr = mCommandBuffer[0]; 
@@ -767,7 +772,7 @@ void CGpu::FillFramebufferRect() {
 	glEnd();
 }
 
-void CGpu::Gouraud3PointPoly() {
+void PsxGpu::Gouraud3PointPoly() {
 	glDisable(GL_TEXTURE_2D);
 
 	VertexG *v = (VertexG*)&mCommandBuffer[0];
@@ -793,7 +798,7 @@ void CGpu::Gouraud3PointPoly() {
 }
 
 /* processed as two 3 point polygons */
-void CGpu::Gouraud4PointPoly() {
+void PsxGpu::Gouraud4PointPoly() {
 	glDisable(GL_TEXTURE_2D);
 
 	VertexG *v = (VertexG*)&mCommandBuffer[0];
@@ -828,7 +833,7 @@ void CGpu::Gouraud4PointPoly() {
 }
 
 /* processed as two 3 point polygons */
-void CGpu::Mono4PointPoly() {
+void PsxGpu::Mono4PointPoly() {
 	glDisable(GL_TEXTURE_2D);
 
 	Vertex *v = (Vertex*)&mCommandBuffer[1];
@@ -847,7 +852,7 @@ void CGpu::Mono4PointPoly() {
 	glEnd();
 }
 
-void CGpu::Textured4PointPoly() {
+void PsxGpu::Textured4PointPoly() {
 	glEnable(GL_TEXTURE_2D);
 
 	VertexT *v = (VertexT*)&mCommandBuffer[1];
@@ -935,15 +940,15 @@ void CGpu::Textured4PointPoly() {
 	} 
 	/* 8-bit clut */
 	else if (mTexPageInfo.tp == 1) {
-		MessageBox(NULL, "8-bit clut\n", "", NULL);
+		MessageBox(0, "8-bit clut\n", "", 0);
 	} 
 	/* 15-bit direct */
 	else if (mTexPageInfo.tp == 2) {
-		MessageBox(NULL, "15-bit direct\n", "", NULL);
+		MessageBox(0, "15-bit direct\n", "", 0);
 	}
 }
 
-void CGpu::Sprite() {
+void PsxGpu::Sprite() {
 	glEnable(GL_TEXTURE_2D);
 
 	u16 x = (mCommandBuffer[1] & 0x3ff) + mDrawOffsetX;
@@ -979,13 +984,13 @@ void CGpu::Sprite() {
 		glBegin(GL_QUADS);
 			glColor4f(1.0f,1.0f,1.0f,1.0f);
 
-			glTexCoord2f(0,(float)height/CGpu::VRAM_HEIGHT);
+			glTexCoord2f(0,(float)height/PsxGpu::VRAM_HEIGHT);
 			glVertex2i(x,y+height);
 
-			glTexCoord2f((float)width/CGpu::VRAM_WIDTH,(float)height/CGpu::VRAM_HEIGHT);
+			glTexCoord2f((float)width/PsxGpu::VRAM_WIDTH,(float)height/PsxGpu::VRAM_HEIGHT);
 			glVertex2i(x+width,y+height);
 
-			glTexCoord2f((float)width/CGpu::VRAM_WIDTH,0);
+			glTexCoord2f((float)width/PsxGpu::VRAM_WIDTH,0);
 			glVertex2i(x+width,y);
 
 			glTexCoord2f(0,0);
@@ -994,20 +999,20 @@ void CGpu::Sprite() {
 	} 
 	/* 8-bit clut */
 	else if (mTexPageInfo.tp == 1) {
-		//MessageBox(NULL, "8-bit clut", "", NULL);
+		//MessageBox(0, "8-bit clut", "", 0);
 	} 
 	/* 15-bit direct */
 	else if (mTexPageInfo.tp == 2) {
-		//MessageBox(NULL, "15-bit direct", "", NULL);
+		//MessageBox(0, "15-bit direct", "", 0);
 	}
 }
 
 /* save state related stuff */
-void CGpu::CheckVramTransferRequest() {
+void PsxGpu::CheckVramTransferRequest() {
 	if (mSaveVram) {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, gl->mRenderTextureID);
-		glReadPixels(0, 0, CGpu::VRAM_WIDTH, CGpu::VRAM_HEIGHT, 
+		glReadPixels(0, 0, PsxGpu::VRAM_WIDTH, PsxGpu::VRAM_HEIGHT, 
 			GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 
 			mVramImagePtr);
 		mSaveVram = FALSE;
@@ -1016,14 +1021,14 @@ void CGpu::CheckVramTransferRequest() {
 		glBindTexture(GL_TEXTURE_2D, gl->mRenderTextureID);
 		glEnable(GL_TEXTURE_2D);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 
-			CGpu::VRAM_WIDTH, CGpu::VRAM_HEIGHT, 
+			PsxGpu::VRAM_WIDTH, PsxGpu::VRAM_HEIGHT, 
 			GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, 
 			mVramImagePtr);
 		mRestoreVram = FALSE;
 	}
 }
 
-void CGpu::UpdateScreen() {
+void PsxGpu::UpdateScreen() {
 	CheckVramTransferRequest();
 
 	// check if display is enabled?
@@ -1045,7 +1050,7 @@ void CGpu::UpdateScreen() {
 	f  e| d  c| b| a  9| 8  7| 6  5| 4| 3  2  1  0
 		|iy|ix|ty|     |   tp|  abr|ty|         tx
 */
-void CGpu::UpdateTexturePage(u16 data) {
+void PsxGpu::UpdateTexturePage(u16 data) {
 	if(mGpuVersion == 2) {
 		mStatusReg = (mStatusReg & 0xfffff800 ) | (data & 0x7ff);
 
@@ -1115,11 +1120,11 @@ struct TGA_HEADER {
 bool SaveTGA(const char *filename, int width, int height, void *pdata) {
 	TGA_HEADER hdr;
 	FILE* f = fopen(filename, "wb");
-	if( f == NULL )
+	if( f == 0 )
 		return false;
 
 	if ( sizeof(TGA_HEADER) != 18 || sizeof(hdr) != 18) {
-		MessageBox(NULL, "", "", NULL);
+		MessageBox(0, "", "", 0);
 	}
 	
 	memset(&hdr, 0, sizeof(hdr));
@@ -1136,7 +1141,7 @@ bool SaveTGA(const char *filename, int width, int height, void *pdata) {
 }
 
 
-void CGpu::SaveVramTga(const char *path) {
+void PsxGpu::SaveVramTga(const char *path) {
 	u32 *pVramImage = new u32 [1024*512];
 
 	glBindTexture(GL_TEXTURE_2D, gl->mRenderTextureID);

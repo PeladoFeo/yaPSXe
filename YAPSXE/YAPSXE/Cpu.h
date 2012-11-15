@@ -152,9 +152,9 @@ union StatusReg {
 	};
 };
 
-class CpuState {
+class PsxCpu {
 public:
-	CpuState();
+	PsxCpu();
 
 	u32 GPR[32];
 	u32 CP0[32];
@@ -166,7 +166,7 @@ public:
 	PsxOpcode PsxOp;
 	int state;
 
-	void SetCpuState(int state) { 
+	void SetPsxCpu(int state) { 
 		this->state = state; 
 	}
 	void Reset();
@@ -175,12 +175,12 @@ public:
 	u32 cycles;
 	u64 mTotalCycles;
 
-	void SetClassPointers();
+	void InitClassPointers();
 
 private:
 	Console *csl;
-	CGpu *gpu;
-	CSpu *spu;
+	PsxGpu *gpu;
+	PsxSpu *spu;
 };
 
 #endif /* CPU_H */

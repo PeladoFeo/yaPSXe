@@ -37,7 +37,7 @@
 	is in order?
 */
 
-void CMemory::DmaExecute(int n) {
+void PsxMemory::DmaExecute(int n) {
 	if ( !(mDmaDPCR & (8 << (n * 4)) && (mDmaCHCR[n] & 0x01000000)) )  {
 		return;
 	}
