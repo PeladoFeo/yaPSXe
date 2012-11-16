@@ -416,55 +416,55 @@ u32 PsxMemory::HwRead32(u32 addr) {
 			return 0;
 
 		case 0x1f801100:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 0 COUNT read32\n");
 #endif
 			return rcnt->ReadCurrent(0);
 
 		case 0x1f801104:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 0 MODE read32\n");
 #endif
 			return rcnt->ReadMode(0);
 
 		case 0x1f801108:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 0 TARGET read32\n");
 #endif
 			return rcnt->ReadTarget(0);
 
 		case 0x1f801110:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 1 COUNT read32\n");
 #endif
 			return rcnt->ReadCurrent(1);
 
 		case 0x1f801114:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 1 MODE read32\n");
 #endif
 			return rcnt->ReadMode(1);
 
 		case 0x1f801118:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 1 TARGET read32\n");
 #endif
 			return rcnt->ReadTarget(1);
 
 		case 0x1f801120:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 2 COUNT read32\n");
 #endif
 			return rcnt->ReadCurrent(2);
 
 		case 0x1f801124:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 2 MODE read32\n");
 #endif
 			return rcnt->ReadMode(2);
 
 		case 0x1f801128:
-#if defined (LOG_MEM_HW_READ16)
+#if defined (LOG_MEM_HW_READ32)
 			csl->out("COUNTER 2 TARGET read32\n");
 #endif
 			return rcnt->ReadTarget(2);
@@ -871,63 +871,63 @@ void PsxMemory::HwWrite32(u32 addr, u32 data) {
 			return;
 
 		case 0x1f801100:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 0 COUNT write32 0x%04x\n", data);
 #endif
 			rcnt->WriteCurrent(0, data);
 			return;
 
 		case 0x1f801104:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 0 MODE write32 0x%04x\n", data);
 #endif
 			rcnt->WriteMode(0, data);
 			return;
 
 		case 0x1f801108:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 0 TARGET write32 0x%04x\n", data);
 #endif
 			rcnt->WriteTarget(0, data);
 			return;
 
 		case 0x1f801110:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 1 COUNT write32 0x%04x\n", data);
 #endif
 			rcnt->WriteCurrent(1, data);
 			return;
 
 		case 0x1f801114:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 1 MODE write32 0x%04x\n", data);
 #endif
 			rcnt->WriteMode(1, data);
 			return;
 
 		case 0x1f801118:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 1 TARGET write32 0x%04x\n", data);
 #endif
 			rcnt->WriteTarget(1, data);
 			return;
 
 		case 0x1f801120:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 2 COUNT write32 0x%04x\n", data);
 #endif
 			rcnt->WriteCurrent(2, data);
 			return;
 
 		case 0x1f801124:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 2 MODE write32 0x%04x\n", data);
 #endif
 			rcnt->WriteMode(2, data);
 			return;
 
 		case 0x1f801128:
-#if defined (LOG_MEM_HW_WRITE16)
+#if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "COUNTER 2 TARGET write32 0x%04x\n", data);
 #endif
 			rcnt->WriteTarget(2, data);

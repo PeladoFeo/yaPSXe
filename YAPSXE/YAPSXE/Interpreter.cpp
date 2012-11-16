@@ -123,7 +123,7 @@ void PsxInterpreter::LogBiosCall() {
 
 void PsxInterpreter::ExecuteInstruction() {
 #if defined (LOG_PSX_BIOS_OUTPUT)
-	// catch calls to putchar
+	// catch calls to putchar, called by printf
 	int addr = cpu->pc & 0x1fffff, op = cpu->GPR[9] & 0xff;
 	if (addr == 0xb0 && op == 0x3d) {
 		psx->csl->out(CCYAN, "%c", psx->cpu->GPR[4] & 0xff);
@@ -134,7 +134,6 @@ void PsxInterpreter::ExecuteInstruction() {
 	LogBiosCall();
 #endif
 
-	// instruction reads could be done faster 
 	cpu->PsxOp.full = mem->Read32(cpu->pc);
 
 #if defined (LOG_CPU_EXEC)

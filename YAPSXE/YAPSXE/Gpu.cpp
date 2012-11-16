@@ -94,7 +94,7 @@ void PsxGpu::InitGpu() {
 u32 PsxGpu::ReadStatus() {
 	/* hack for interlaced scan */
 	static int i = 0;
-	if (i++ % 4) {
+	if (i++ % 2) {
 		mStatusReg ^= 0x80000000;
 	}
 
@@ -1030,6 +1030,8 @@ void PsxGpu::CheckVramTransferRequest() {
 
 void PsxGpu::UpdateScreen() {
 	CheckVramTransferRequest();
+
+	mStatusReg ^= 0x80000000;
 
 	// check if display is enabled?
 	
