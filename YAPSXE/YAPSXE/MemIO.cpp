@@ -840,8 +840,13 @@ void PsxMemory::HwWrite32(u32 addr, u32 data) {
 #if defined (LOG_MEM_HW_WRITE32)
 			csl->out(CWHITE, "DMA ICR write32 0x%08x\n", data);
 #endif
-			u32 tmp = (~data) & mDmaDICR;
-			mDmaDICR = ((tmp ^ data) & 0xffffff) ^ tmp;
+				mDmaDICR = (mDmaDICR & (0x80000000) ) |
+					(mDmaDICR & ~data & 0x7f000000) |
+					(data & 0x00ffffff);
+
+				if((mDmaDICR & 0x80000000) != 0 && (mDmaDICR & 0x7f000000) == 0) {
+					mDmaDICR &= ~0x80000000;
+				}
 			} return;
 
 		case 0x1f801810:
