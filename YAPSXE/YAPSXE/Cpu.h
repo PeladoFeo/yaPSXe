@@ -166,7 +166,7 @@ public:
 	PsxOpcode PsxOp;
 	int state;
 
-	void SetPsxCpu(int state) { 
+	void SetCpuState(int state) { 
 		this->state = state; 
 	}
 	void Reset();

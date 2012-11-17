@@ -502,7 +502,7 @@ void PsxGpu::WriteData(u32 *pData, u32 size) {
 					csl->out(CRED, "** Unimplemented GPU command 0x58: gouraud polyline\n");
 				}
 #endif
-				psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+				psx->cpu->SetCpuState(PSX_CPU_HALTED);
 			} break;
 
 			case 0x60:

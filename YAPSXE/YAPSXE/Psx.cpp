@@ -132,10 +132,10 @@ Psx::~Psx() {
 void Psx::PauseEmulation(BOOL pause) {
 	if (pause) {
 		CheckMenuItem(mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_CHECKED);
-		cpu->SetPsxCpu(PSX_CPU_HALTED);
+		cpu->SetCpuState(PSX_CPU_HALTED);
 	} else {
 		CheckMenuItem(mMainWnd->GetHMenu(), IDM_EMULATION_PAUSE, MF_UNCHECKED);
-		cpu->SetPsxCpu(PSX_CPU_RUNNING);
+		cpu->SetCpuState(PSX_CPU_RUNNING);
 	}
 }
 
@@ -160,13 +160,13 @@ void Psx::StartEmulation() {
 
 #if defined (_DEBUG)
 	if (mCpuDbg->mmMainWnd->IsOpen() && !mDispWnd->mFullscreen) {
-		cpu->SetPsxCpu(PSX_CPU_STEPPING);
+		cpu->SetCpuState(PSX_CPU_STEPPING);
 		mCpuDbg->UpdateDebugger();
 	} else {
-		cpu->SetPsxCpu(PSX_CPU_RUNNING);
+		cpu->SetCpuState(PSX_CPU_RUNNING);
 	}
 #else
-	cpu->SetPsxCpu(PSX_CPU_RUNNING);
+	cpu->SetCpuState(PSX_CPU_RUNNING);
 #endif
 }
 
@@ -279,7 +279,7 @@ BOOL Psx::RestoreSaveStateFile(const char *filename) {
 	}
 	delete [] id;
 
-	cpu->SetPsxCpu(PSX_CPU_HALTED);
+	cpu->SetCpuState(PSX_CPU_HALTED);
 
 	/* read the date and time */
 	fSaveState.read((char*)timebuf, 18);
@@ -321,7 +321,7 @@ void EmulationThreadEntryFunc() {
 		return;
 	}
 
-	psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+	psx->cpu->SetCpuState(PSX_CPU_HALTED);
 	psx->ResetPsx();
 	psx->interpreter->Execute();
 }

@@ -58,8 +58,9 @@ public:
 	u32 mDmaDPCR;
 	u32 mDmaDICR;
 
-	u8 RAM[0x200000];
-	u8 BIOS[0x80000];
+	u8 ram[0x200000];
+	u8 bios[0x80000];
+	u8 dcache[1024];
 
 private:
 	Console *csl;

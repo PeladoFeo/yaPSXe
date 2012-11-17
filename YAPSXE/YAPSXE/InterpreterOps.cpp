@@ -98,7 +98,7 @@ void PsxInterpreter::unimplemented() {
 	while (pstr[i] != ' ' && i < strlen(pstr)) i++; 
 	pstr[i] = '\0';
 	Psx::GetInstance()->csl->out(CRED, "Unimplemented instruction '%s'\n", pstr);
-	cpu->SetPsxCpu(PSX_CPU_STEPPING);
+	cpu->SetCpuState(PSX_CPU_STEPPING);
 	Psx::GetInstance()->mCpuDbg->OpenDebugger();
 #endif
 }

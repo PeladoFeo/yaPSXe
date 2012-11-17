@@ -379,11 +379,11 @@ BOOL PsxMemory::LoadBiosRom(std::string path) {
 	}
 
 	biosrom.seekg(0, std::ios::beg);
-	biosrom.read((char*)BIOS, size);
+	biosrom.read((char*)bios, size);
 
 	biosrom.close();
 	
-	u32 checksum = CheckSum(BIOS, BIOS_SIZE);
+	u32 checksum = CheckSum(bios, BIOS_SIZE);
 
 	for (u32 i = 0; gBiosData[i].checksum != terminator; i++) {
 		if (gBiosData[i].checksum == checksum) {
@@ -394,7 +394,7 @@ BOOL PsxMemory::LoadBiosRom(std::string path) {
 			// no ascii info in SCPH-1000
 			if (gBiosData[i].checksum != 0xc9a3264f) {
 				char strBiosInfo[0x60];
-				memcpy(strBiosInfo, &BIOS[0x7ff32], 0x60);
+				memcpy(strBiosInfo, &bios[0x7ff32], 0x60);
 
 				// remove null characters
 				for (int i = 0; i < 0x5e; i++) {

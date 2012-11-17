@@ -132,7 +132,7 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
         case WM_DESTROY:
             PostQuitMessage(0);
-			Psx::GetInstance()->SignalQuit();
+			psx->SignalQuit();
 			break;
 
 		case WM_KEYDOWN: {
@@ -144,9 +144,9 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		} break;
 
 		case WM_SIZE:
-			Psx::GetInstance()->mDispWnd->width = lParam & 0xffff;
-			Psx::GetInstance()->mDispWnd->height = lParam >> 16;
-			if (Psx::GetInstance()->gl->mInitialised) {
+			psx->mDispWnd->width = lParam & 0xffff;
+			psx->mDispWnd->height = lParam >> 16;
+			if (psx->gl->mInitialised) {
 				//glViewport(0, 0, Psx::GetInstance()->mMainWnd->width, Psx::GetInstance()->mMainWnd->height);
 			}
 			break;
@@ -157,7 +157,7 @@ LRESULT DisplayWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     return 0;
 }
 
-LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	static Psx *psx = Psx::GetInstance();
     switch(msg) {
 		case WM_COMMAND: {
@@ -172,7 +172,7 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				case IDM_EMULATION_LOAD_SAVESTATE: {
 					char path[MAX_PATH];
-					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+					psx->cpu->SetCpuState(PSX_CPU_HALTED);
 					if (Window::OpenFileDlg(hwnd, path, 
 						"Savestates (*.svt)\0*.svt\0All files (*.*)\0*.*\0\0")
 						) {
@@ -182,13 +182,13 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 				case IDM_EMULATION_CREATE_SAVESTATE: {
 					char path[MAX_PATH];
-					psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+					psx->cpu->SetCpuState(PSX_CPU_HALTED);
 					if (Window::SaveFileDlg(hwnd, path,
 						"All files (*.*)\0*.*\0\0")
 						) {
 						psx->CreateSaveStateFile(path);
 					}
-					psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+					psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 				} break;
 
 				case IDM_EMULATION_RESET:
@@ -203,11 +203,11 @@ LRESULT mMainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 					if (state & MF_GRAYED)
 						break;
 					if (state & MF_CHECKED) {
-						psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+						psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 						CheckMenuItem(psx->mMainWnd->GetHMenu(), 
 							IDM_EMULATION_PAUSE, MF_UNCHECKED);
 					} else {
-						psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+						psx->cpu->SetCpuState(PSX_CPU_HALTED);
 						CheckMenuItem(psx->mMainWnd->GetHMenu(), 
 							IDM_EMULATION_PAUSE, MF_CHECKED);
 					}
@@ -367,7 +367,7 @@ static BOOL CreateMainWindows(Psx *psx) {
 
 	/* create the menu window */
 	if (!psx->mMainWnd->WindowCreate(title, "ClassNamePSX", 300, 200, 
-			FALSE, TRUE, mMainWndProc, RGB(200,200,200))) {
+			FALSE, TRUE, MainWndProc, RGB(200,200,200))) {
 		return FALSE;
 	}
 

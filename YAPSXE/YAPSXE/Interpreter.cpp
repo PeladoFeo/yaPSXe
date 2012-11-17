@@ -83,7 +83,7 @@ void PsxInterpreter::Execute() {
 			case PSX_CPU_RUNNING: {
 				if (psx->mPPsxBreakpoints->CheckBreakpoint(cpu->pc)) {
 					psx->csl->out(CRED, "Breakpoint detected @ 0x%08X\n", cpu->pc);
-					cpu->SetPsxCpu(PSX_CPU_STEPPING);
+					cpu->SetCpuState(PSX_CPU_STEPPING);
 					psx->mCpuDbg->OpenDebugger();
 				} else {
 					ExecuteInstruction();
@@ -114,10 +114,17 @@ void PsxInterpreter::LogBiosCall() {
 		for (int i = 0; bioscalls[i].prototype; i++) {
 			if (bioscalls[i].address == address && 
 				bioscalls[i].operation == operation) {
-				csl->out(CGREEN, "BIOS call: %s\n", bioscalls[i].prototype);
+				csl->out(CGREEN, "Syscall: %s\n", bioscalls[i].prototype);
 				break;
 			}
 		}
+
+		//if (address == 0xc0) {
+		//	psx->cpu->GPR[9] = 0x00; // t1
+		//	psx->cpu->GPR[4] = 0;	// a0
+		//	psx->cpu->SetCpuState(PSX_CPU_STEPPING);
+		//	psx->mCpuDbg->OpenDebugger();
+		//}
 	}
 }
 

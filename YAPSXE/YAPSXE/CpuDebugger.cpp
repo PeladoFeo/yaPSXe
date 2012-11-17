@@ -79,7 +79,7 @@ void PsxCpuDebugger::OpenDebugger() {
 	mmMainWnd->ShowWnd(TRUE);
 	mDasmStartAddr = psx->cpu->pc;
 	mMemoryViewAddr = psx->cpu->pc;
-	psx->cpu->SetPsxCpu(PSX_CPU_STEPPING);
+	psx->cpu->SetCpuState(PSX_CPU_STEPPING);
 	UpdateDebugger();
 }
 
@@ -115,9 +115,9 @@ LRESULT CpuWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 		case WM_KEYDOWN: {
 			if (wParam == VK_F5) {
-				psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+				psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 			} else if (wParam == VK_F6) {
-				psx->cpu->SetPsxCpu(PSX_CPU_STEPPING);
+				psx->cpu->SetCpuState(PSX_CPU_STEPPING);
 				psx->mCpuDbg->UpdateDebugger();
 			} else if (wParam == VK_F7) {
 				psx->mCpuDbg->StepDebugger();
@@ -137,11 +137,11 @@ LRESULT CpuWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		case WM_COMMAND: {
 			switch(LOWORD(wParam)) {
 				case IDM_ACTION_RUN:
-					psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+					psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 					break;
 
 				case IDM_ACTION_BREAK:
-					psx->cpu->SetPsxCpu(PSX_CPU_STEPPING);
+					psx->cpu->SetCpuState(PSX_CPU_STEPPING);
 					psx->mCpuDbg->UpdateDebugger();
 					break;
 
@@ -161,7 +161,7 @@ LRESULT CpuWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			psx->mCpuDbg->mmMainWnd->ShowWnd(FALSE);
 
 			if (psx->mDispWnd->IsOpen()) {
-				psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+				psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 			}
 			break;
 
@@ -390,17 +390,17 @@ LRESULT CpuRegWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 u8 PsxCpuDebugger::DebugCpuReadByte(u32 addr) {
 	if (addr < 0x00200000) {
-		return psx->mem->RAM[addr];
+		return psx->mem->ram[addr];
 	} else if (addr >= 0x1f800000 && addr <= 0x1f8003ff) {
 		return 0;	/* ***** TODO ***** */
 	} else if (addr >= 0x1f801000 && addr <= 0x1f802fff) {
 		return psx->mem->HwRead8(addr);
 	} else if (addr >= 0x80000000 && addr <= 0x801fffff) {
-		return psx->mem->RAM[addr & 0x1fffffff];
+		return psx->mem->ram[addr & 0x1fffffff];
 	} else if (addr >= 0xa0000000 && addr <= 0xa01fffff) {
-		return psx->mem->RAM[addr & 0x1fffffff];
+		return psx->mem->ram[addr & 0x1fffffff];
 	} else if (addr >= 0xbfc00000 && addr <= 0xbfc7ffff) {
-		return psx->mem->BIOS[addr & 0x7ffff];
+		return psx->mem->bios[addr & 0x7ffff];
 	} else {
 		return 0;
 	}

@@ -33,6 +33,7 @@
 #define LOG_MEM_HW_WRITE8
 #define LOG_MEM_HW_WRITE16
 #define LOG_MEM_HW_WRITE32
+#define LOG_GPU_DATA_WRITE32
 #endif
 
 u8 PsxMemory::HwRead8(u32 addr) {
@@ -244,7 +245,7 @@ u32 PsxMemory::HwRead32(u32 addr) {
 			//csl->out(CWHITE, "IREG read32\n");
 #endif
 			//Psx::GetInstance()->mCpuDbg->OpenDebugger();
-			//cpu->SetPsxCpu(PSX_CPU_STEPPING);
+			//cpu->SetCpuState(PSX_CPU_STEPPING);
 			return mIREG;
 
 		case 0x1f801074: 
@@ -850,9 +851,9 @@ void PsxMemory::HwWrite32(u32 addr, u32 data) {
 			} return;
 
 		case 0x1f801810:
-//#if defined (LOG_MEM_HW_WRITE32)
-			//csl->out(CWHITE, "GPU DATA write32 0x%08x %d\n", data);
-//#endif
+#if defined (LOG_GPU_DATA_WRITE32)
+			csl->out(CWHITE, "GPU DATA write32 0x%08x\n", data);
+#endif
 			gpu->WriteData(&data, 1);
 			return;
 

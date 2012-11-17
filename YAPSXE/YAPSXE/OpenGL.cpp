@@ -272,7 +272,7 @@ static void GetMaxDispRes(int &width, int &height) {
 void PsxGLRenderer::ToggleFullscreenMode() {
 	Psx *psx = Psx::GetInstance();
 
-	psx->cpu->SetPsxCpu(PSX_CPU_HALTED);
+	psx->cpu->SetCpuState(PSX_CPU_HALTED);
 
 	glWindow->ShowWnd(FALSE);
 
@@ -299,5 +299,5 @@ void PsxGLRenderer::ToggleFullscreenMode() {
 	SetForegroundWindow(glWindow->GetHwnd());
 	SetFocus(glWindow->GetHwnd());
 
-	psx->cpu->SetPsxCpu(PSX_CPU_RUNNING);
+	psx->cpu->SetCpuState(PSX_CPU_RUNNING);
 }

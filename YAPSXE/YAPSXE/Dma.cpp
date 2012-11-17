@@ -78,7 +78,7 @@ void PsxMemory::DmaExecute(int n) {
 #endif
 					cpu->cycles += 1000;
 
-					u32 *ptr = (u32*)(RAM + madr);
+					u32 *ptr = (u32*)(ram + madr);
 					u32 size = (bcr >> 16) * (bcr & 0xffff);
 					gpu->WriteData(ptr, size);
 				} break;
@@ -88,7 +88,7 @@ void PsxMemory::DmaExecute(int n) {
 #if defined (LOG_DMA)
 					csl->out(CGREEN, "DMA2 GPU: dma chain\n");
 #endif
-					u32 *wmem = (u32*)(RAM + madr);
+					u32 *wmem = (u32*)(ram + madr);
 					u32 nextaddr;
 					u32 size;
 
@@ -98,7 +98,7 @@ void PsxMemory::DmaExecute(int n) {
 						size = wmem[0] >> 24;
 						nextaddr = wmem[0] & 0xffffff;
 						gpu->WriteData(wmem+1, size);
-						wmem = (u32*)(RAM + (nextaddr & 0x1fffff));
+						wmem = (u32*)(ram + (nextaddr & 0x1fffff));
 					} while (nextaddr != 0xffffff);
 				} break;
 
@@ -137,7 +137,7 @@ void PsxMemory::DmaExecute(int n) {
 			csl->out(CGREEN, "DMA GPU OTC\n");
 #endif
 			if (mDmaCHCR[n] == 0x11000002) {
-				u32 *mem = (u32*)&RAM[madr & 0x1fffff];
+				u32 *mem = (u32*)&ram[madr & 0x1fffff];
 				while (bcr--) {
 					*mem-- = (madr - 4) & 0xffffff;
 					madr -= 4;
