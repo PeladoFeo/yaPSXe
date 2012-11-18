@@ -109,6 +109,8 @@ public:
 
 	void Sprite();
 
+	void Clut4ToRgba16(u16 w, u16 h, u16 *palette, u16 *teximage, u16 *out);
+
 #if 0
 	void SaveVramTga(const char *path);
 #endif 

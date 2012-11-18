@@ -876,66 +876,6 @@ void PsxGpu::Textured4PointPoly() {
 
 	/* 4-bit clut */
 	if (mTexPageInfo.tp == 0) {
-		u16 palette[256];
-		u16 clutx  = (v[0].txinfo & 0x3f) << 4;
-		u16 cluty = (v[0].txinfo >> 6 ) & 0x3ff;
-
-		/* read palette and texture data */
-		glReadPixels(clutx, cluty, 16, 1, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, palette);
-		glReadPixels(mTexPageInfo.tx, mTexPageInfo.ty, 64, 64, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, teximage);		
-
-		/* do colour lookup conversion */
-		for (int i = 0; i < 256*256; i += 4) {
-			resimage[i] = palette[teximage[i >> 2] & 0xf];
-			resimage[i+1] = palette[(teximage[i >> 2] >> 4) & 0xf];
-			resimage[i+2] = palette[(teximage[i >> 2] >> 8) & 0xf];
-			resimage[i+3] = palette[(teximage[i >> 2] >> 12) & 0xf];
-		}
-
-		/* update texture */
-		glBindTexture(GL_TEXTURE_2D, mCacheTexID);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, 256, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, resimage);
-
-		//csl->out("%d %d\n", mTexPageInfo.tx, mTexPageInfo.ty);
-
-		/*
-		glBegin(GL_TRIANGLES);
-			glTexCoord2f(0.0, 0.0);
-			glVertex2sv((GLshort*)&vtxt[0].xy);
-
-			glTexCoord2f(0.25, 0.0);
-			glVertex2sv((GLshort*)&vtxt[1].xy);
-
-			glTexCoord2f(0.25, 0.25);
-			glVertex2sv((GLshort*)&vtxt[2].xy);
-
-			glTexCoord2f(0.25, 0.25);
-			glVertex2sv((GLshort*)&vtxt[2].xy);
-
-			glTexCoord2f(0.25, 0.0);
-			glVertex2sv((GLshort*)&vtxt[1].xy);
-
-			glTexCoord2f(0.0, 0.25);
-			glVertex2sv((GLshort*)&vtxt[3].xy);
-		glEnd();
-		*/
-		//for (int i = 0; i < 4; i++) {
-		//	csl->out("u%d=%d, v%d=%d\n", i, vtxt[i].u, i, vtxt[i].v);
-		//}
-
-		//glDisable(GL_TEXTURE_2D);
-		//glPointSize(3.0);
-		//glBegin(GL_POINTS);
-		//	glColor4f(1.0f,0.0f,0.0f,1.0f);
-		//	glVertex2i(vtxt[0].u, vtxt[0].v);
-		//	glVertex2i(vtxt[1].u, vtxt[1].v);
-		//	glVertex2i(vtxt[2].u, vtxt[2].v );
-		//	glVertex2i(vtxt[3].u, vtxt[3].v);
-		//glEnd();
-
-		//Sleep(100);
-
-		//UpdateScreen();
 
 	} 
 	/* 8-bit clut */
@@ -948,6 +888,20 @@ void PsxGpu::Textured4PointPoly() {
 	}
 }
 
+/* colour lookup table conversion 
+   w, h is the width and height of pixel data
+   palette is the clut 
+   teximage is the 4-bit pixel data to convert
+   16-bit pixels are returned in out */
+void PsxGpu::Clut4ToRgba16(u16 w, u16 h, u16 *palette, u16 *teximage, u16 *out) {
+	for (int i = 0; i < w*h; i += 4) {
+		out[i] = palette[teximage[i >> 2] & 0xf];
+		out[i+1] = palette[(teximage[i >> 2] >> 4) & 0xf];
+		out[i+2] = palette[(teximage[i >> 2] >> 8) & 0xf];
+		out[i+3] = palette[(teximage[i >> 2] >> 12) & 0xf];
+	}
+}
+
 void PsxGpu::Sprite() {
 	glEnable(GL_TEXTURE_2D);
 
@@ -955,9 +909,10 @@ void PsxGpu::Sprite() {
 	u16 y = ((mCommandBuffer[1] >> 16) & 0x1ff) + mDrawOffsetY;
 	u16 width = mCommandBuffer[3] & 0x3ff;
 	u16 height = (mCommandBuffer[3] >> 16) & 0x1ff;
-	u32 imgsize = width*height;
 	static u16 teximage[256*256];
 	static u16 resimage[256*256];
+
+	glDisable(GL_TEXTURE_2D);
 
 	/* 4-bit clut */
 	if (mTexPageInfo.tp == 0) {
@@ -965,37 +920,19 @@ void PsxGpu::Sprite() {
 		u16 clutx  = ((mCommandBuffer[2] >> 16) & 0x3f) << 4;
 		u16 cluty = ((mCommandBuffer[2] >> 16) >> 6 ) & 0x3ff;
 
+		memset(teximage, 0, 256*256*sizeof(u16));
+		memset(resimage, 0, 256*256*sizeof(u16));
+
 		/* read palette and texture data */
 		glReadPixels(clutx, cluty, 16, 1, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, palette);
 		glReadPixels(mTexPageInfo.tx, mTexPageInfo.ty, width >> 2, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, teximage);
 
 		/* do colour lookup conversion */
-		for (int i = 0; i < imgsize; i += 4) {
-			resimage[i] = palette[teximage[i >> 2] & 0xf];
-			resimage[i+1] = palette[(teximage[i >> 2] >> 4) & 0xf];
-			resimage[i+2] = palette[(teximage[i >> 2] >> 8) & 0xf];
-			resimage[i+3] = palette[(teximage[i >> 2] >> 12) & 0xf];
-		}
+		Clut4ToRgba16(width, height, palette, teximage, resimage);
 
-		/* update texture */
-		glBindTexture(GL_TEXTURE_2D, mCacheTexID);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, resimage);
-
-		glBegin(GL_QUADS);
-			glColor4f(1.0f,1.0f,1.0f,1.0f);
-
-			glTexCoord2f(0,(float)height/PsxGpu::VRAM_HEIGHT);
-			glVertex2i(x,y+height);
-
-			glTexCoord2f((float)width/PsxGpu::VRAM_WIDTH,(float)height/PsxGpu::VRAM_HEIGHT);
-			glVertex2i(x+width,y+height);
-
-			glTexCoord2f((float)width/PsxGpu::VRAM_WIDTH,0);
-			glVertex2i(x+width,y);
-
-			glTexCoord2f(0,0);
-			glVertex2i(x,y);
-		glEnd();
+		/* write the image to vram */
+		glRasterPos2d(x,y);
+		glDrawPixels(width, height, GL_RGBA, GL_UNSIGNED_SHORT_1_5_5_5_REV, resimage);
 	} 
 	/* 8-bit clut */
 	else if (mTexPageInfo.tp == 1) {
